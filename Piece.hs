@@ -1,4 +1,4 @@
-module Piece (Piece(..), Color(..), Type(..), printPiece) where
+module Piece (Piece(..), Color(..), Type(..), printPiece, printBigPiece) where
 
 import Data.Char
 
@@ -20,3 +20,7 @@ printPiece (Piece t color) = case color of
                                Black -> toLower c
     where (Just c) = lookup t pieceChars
 
+printBigPiece :: Piece -> String
+printBigPiece p@(Piece _ color) = case color of
+                                  White -> toUpper (printPiece p) : "W"
+                                  Black -> toUpper (printPiece p) : "B"

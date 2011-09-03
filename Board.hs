@@ -61,7 +61,12 @@ printPrettyBoard board = toLines 8 $ foldr f "" (elems board)
           toLines n str = line ++ "\n" ++ [intToDigit n] ++ " " ++ take 16 str ++ "|\n" ++ toLines (n - 1) (drop 16 str)
           line = "  " ++ concat (replicate 8 "+-") ++ "+"
 
-
 printBigPrettyBoard :: Board -> String
-printBigPrettyBoard = undefined
+printBigPrettyBoard board = toLines 8 $ foldr f "" (elems board)
+    where f sq str = "|" ++ squareToString sq ++ str
+          toLines _ [] = line ++ "\n     a    b    c    d    e    f    g    h"
+          toLines n str = line ++ "\n" ++ [intToDigit n] ++ "  " ++ take 40 str ++ "|\n" ++ toLines (n - 1) (drop 40 str)
+          line = "   " ++ concat (replicate 8 "+----") ++ "+"
+          squareToString Empty = "    "
+          squareToString (Square p) = " " ++ printBigPiece p ++ " "
 
