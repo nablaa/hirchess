@@ -1,6 +1,7 @@
 module Board (Board, Coordinates, initialBoard,
               printBoard, printPrettyBoard, printBigPrettyBoard) where
 
+import Data.Char
 import Data.Maybe
 import Data.Array
 import Piece
@@ -43,17 +44,23 @@ removePiece = undefined
 movePiece :: Board -> Coordinates -> Coordinates -> Board
 movePiece = undefined
 
+squareToChar :: Square -> Char
+squareToChar Empty = ' '
+squareToChar (Square p) = printPiece p
 
 printBoard :: Board -> String
 printBoard board = toLines $ foldr f "" (elems board)
     where f sq str = squareToChar sq : str
           toLines [] = []
           toLines str = take 8 str ++ "\n" ++ toLines (drop 8 str)
-          squareToChar Empty = ' '
-          squareToChar (Square p) = printPiece p
 
 printPrettyBoard :: Board -> String
-printPrettyBoard = undefined
+printPrettyBoard board = toLines 8 $ foldr f "" (elems board)
+    where f sq str = '|' : squareToChar sq : str
+          toLines _ [] = line ++ "\n   a b c d e f g h"
+          toLines n str = line ++ "\n" ++ [intToDigit n] ++ " " ++ take 16 str ++ "|\n" ++ toLines (n - 1) (drop 16 str)
+          line = "  " ++ concat (replicate 8 "+-") ++ "+"
+
 
 printBigPrettyBoard :: Board -> String
 printBigPrettyBoard = undefined
