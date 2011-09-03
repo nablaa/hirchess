@@ -1,4 +1,4 @@
-module Piece (Piece, Color, printPiece) where
+module Piece (Piece(..), Color(..), Type(..), printPiece) where
 
 import Data.Char
 

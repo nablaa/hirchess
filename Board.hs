@@ -1,4 +1,5 @@
-module Board (Board, Coordinates) where
+module Board (Board, Coordinates, initialBoard,
+              printBoard, printPrettyBoard, printBigPrettyBoard) where
 
 import Data.Maybe
 import Data.Array
@@ -12,7 +13,10 @@ type Board = Array Coordinates Square
 
 
 initialBoard :: Board
-initialBoard = undefined
+initialBoard = listArray ((0, 0), (7, 7)) rows
+    where officerRow p = map (\x -> Square (Piece x p)) [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
+          pawnRow p = map (\x -> Square (Piece x p)) $ replicate 8 Pawn
+          rows = officerRow Black ++ pawnRow Black ++ replicate 32 Empty ++ pawnRow White ++ officerRow White
 
 emptyBoard :: Board
 emptyBoard = undefined
@@ -41,7 +45,12 @@ movePiece = undefined
 
 
 printBoard :: Board -> String
-printBoard = undefined
+printBoard board = toLines $ foldr f "" (elems board)
+    where f sq str = squareToChar sq : str
+          toLines [] = []
+          toLines str = take 8 str ++ "\n" ++ toLines (drop 8 str)
+          squareToChar Empty = ' '
+          squareToChar (Square p) = printPiece p
 
 printPrettyBoard :: Board -> String
 printPrettyBoard = undefined
