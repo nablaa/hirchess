@@ -1,5 +1,5 @@
 module Board (Board, Coordinates, initialBoard,
-              printBoard, printPrettyBoard, printBigPrettyBoard) where
+              printBoard, printPrettyBoard, printBigPrettyBoard, printSquares) where
 
 import Data.Char
 import Data.Maybe
@@ -20,7 +20,7 @@ initialBoard = listArray ((0, 0), (7, 7)) rows
           rows = officerRow Black ++ pawnRow Black ++ replicate 32 Empty ++ pawnRow White ++ officerRow White
 
 emptyBoard :: Board
-emptyBoard = undefined
+emptyBoard = listArray ((0, 0), (7, 7)) (repeat Empty)
 
 getPiece :: Board -> Coordinates -> Maybe Piece
 getPiece = undefined
@@ -43,6 +43,7 @@ removePiece = undefined
 
 movePiece :: Board -> Coordinates -> Coordinates -> Board
 movePiece = undefined
+
 
 squareToChar :: Square -> Char
 squareToChar Empty = ' '
@@ -70,3 +71,6 @@ printBigPrettyBoard board = toLines 8 $ foldr f "" (elems board)
           squareToString Empty = "    "
           squareToString (Square p) = " " ++ printBigPiece p ++ " "
 
+
+printSquares :: (Board -> String) -> [Coordinates] -> String
+printSquares f squares = f $ emptyBoard // [(s, Square (Piece Pawn White)) | s <- squares]
