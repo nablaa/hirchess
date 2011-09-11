@@ -119,15 +119,18 @@ printBigPrettyBoard board = toLines 8 $ foldr f "" (elems board)
 printSquares :: (Board -> String) -> [Coordinates] -> String
 printSquares f squares = f $ emptyBoard // [(s, Square (Piece Pawn White)) | s <- squares]
 
-parseBoard' :: String -> [Square]
+parseBoard' :: String -> [Maybe Piece]
 parseBoard' [] = []
 parseBoard' ('\n':xs) = parseBoard' xs
-parseBoard' (x:xs) = case parsePiece x of
-                       Just piece -> Square piece : parseBoard' xs
-                       Nothing -> Empty : parseBoard' xs
+parseBoard' (x:xs) = parsePiece x : parseBoard' xs
 
 parseBoard :: String -> Board
-parseBoard str = listArray ((0, 0), (7, 7)) $ parseBoard' str
+parseBoard str = boardFromPieces $ parseBoard' str
 
 debugPrint :: Board -> IO ()
 debugPrint = putStrLn . printBigPrettyBoard
+
+boardFromPieces :: [Maybe Piece] -> Board
+boardFromPieces pieces = listArray ((0, 0), (7, 7)) $ map f pieces
+    where f (Just piece) = Square piece
+          f Nothing = Empty
