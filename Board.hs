@@ -1,9 +1,11 @@
 module Board (Board, Coordinates, initialBoard,
-              printBoard, printPrettyBoard, printBigPrettyBoard, printSquares) where
+              printBoard, printPrettyBoard, printBigPrettyBoard, printSquares,
+              canMove, canCapture, getPlayer, isColor, getReachable) where
 
 import Data.Char
 import Data.Maybe
 import Data.Array
+import Data.List
 import Piece
 
 data Square = Square Piece | Empty
@@ -52,6 +54,31 @@ removePiece = undefined
 movePiece :: Board -> Coordinates -> Coordinates -> Board
 movePiece = undefined
 
+iterateDirection' :: Board -> Color -> Coordinates -> Coordinates -> [Coordinates] -> [Coordinates]
+iterateDirection' board color square@(x, y) direction@(dx ,dy) squares
+    | not $ isInsideBoard square = squares
+    | isEmpty board square = iterateDirection' board color (x + dx, y + dy) direction (square : squares)
+    | otherwise = if isColor board square color then
+                      squares
+                  else
+                      square : squares
+
+iterateDirection :: Board -> Color -> Coordinates -> Coordinates -> [Coordinates]
+iterateDirection board color (x, y) direction@(dx, dy) = iterateDirection' board color (x + dx, y + dy) direction []
+
+getReachable :: Board -> Piece -> Coordinates -> [Coordinates]
+getReachable board piece@(Piece Pawn _) square = moveSquares square piece
+getReachable board piece@(Piece Knight _) square = moveSquares square piece
+getReachable board piece@(Piece King _) square = moveSquares square piece
+getReachable board piece@(Piece _ color) square = nub $ sort $ concatMap (iterateDirection board color square) (moveDirections piece)
+
+canMove :: Board -> Piece -> Coordinates -> Coordinates -> Bool
+canMove board piece start end = isInsideBoard start && isInsideBoard end
+                                && isEmpty board end && end `elem` getReachable board piece start
+
+canCapture :: Board -> Piece -> Coordinates -> Coordinates -> Bool
+canCapture board piece@(Piece _ color) start end = isInsideBoard start && isInsideBoard end
+                                                  && isColor board end (opponent color) && end `elem` getReachable board piece start
 
 squareToChar :: Square -> Char
 squareToChar Empty = ' '
