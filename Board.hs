@@ -1,6 +1,7 @@
 module Board (Board, Coordinates, initialBoard, emptyBoard,
               printBoard, printPrettyBoard, printBigPrettyBoard, printSquares,
-              canMove, canCapture, getPlayer, isColor, getReachable, addPiece, removePiece, movePiece) where
+              canMove, canCapture, getPlayer, isColor, getReachable, addPiece, removePiece, movePiece,
+              addPieces, debugPrint) where
 
 import Data.Char
 import Data.Maybe
@@ -58,6 +59,10 @@ movePiece board start end = addPiece board' end piece
     where board' = removePiece board start
           (Just piece) = getPiece board start
 
+addPieces :: Board -> [(Coordinates, Piece)] -> Board
+addPieces board list = foldr f board list
+    where f (coordinates, piece) b = addPiece b coordinates piece
+
 iterateDirection' :: Board -> Color -> Coordinates -> Coordinates -> [Coordinates] -> [Coordinates]
 iterateDirection' board color square@(x, y) direction@(dx ,dy) squares
     | not $ isInsideBoard square = squares
@@ -113,3 +118,6 @@ printBigPrettyBoard board = toLines 8 $ foldr f "" (elems board)
 
 printSquares :: (Board -> String) -> [Coordinates] -> String
 printSquares f squares = f $ emptyBoard // [(s, Square (Piece Pawn White)) | s <- squares]
+
+debugPrint :: Board -> IO ()
+debugPrint = putStrLn . printBigPrettyBoard
