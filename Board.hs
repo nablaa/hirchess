@@ -23,16 +23,24 @@ emptyBoard :: Board
 emptyBoard = listArray ((0, 0), (7, 7)) (repeat Empty)
 
 getPiece :: Board -> Coordinates -> Maybe Piece
-getPiece = undefined
+getPiece board coordinates | inRange (bounds board) coordinates = f $ board ! coordinates
+                           where f Empty = Nothing
+                                 f (Square piece) = Just piece
+getPiece _ _ = Nothing
 
 getPlayer :: Board -> Coordinates -> Maybe Color
-getPlayer = undefined
+getPlayer b c = case getPiece b c of
+                  Just (Piece _ color) -> Just color
+                  Nothing -> Nothing
 
 isEmpty :: Board -> Coordinates -> Bool
-isEmpty = undefined
+isEmpty b c = getPiece b c == Nothing
+
+isColor :: Board -> Coordinates -> Color -> Bool
+isColor b c color = Just color == getPlayer b c
 
 isInsideBoard :: Coordinates -> Bool
-isInsideBoard = undefined
+isInsideBoard (i, j) = i >= 0 && i <= 7 && j >= 0 && j <= 7
 
 
 addPiece :: Board -> Coordinates -> Piece -> Board
