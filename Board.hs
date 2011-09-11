@@ -1,6 +1,6 @@
 module Board (Board, Coordinates, initialBoard,
               printBoard, printPrettyBoard, printBigPrettyBoard, printSquares,
-              canMove, canCapture, getPlayer, isColor, getReachable) where
+              canMove, canCapture, getPlayer, isColor, getReachable, addPiece, removePiece, movePiece) where
 
 import Data.Char
 import Data.Maybe
@@ -44,15 +44,19 @@ isColor b c color = Just color == getPlayer b c
 isInsideBoard :: Coordinates -> Bool
 isInsideBoard (i, j) = i >= 0 && i <= 7 && j >= 0 && j <= 7
 
+updateBoard :: Board -> Coordinates -> Square -> Board
+updateBoard board coordinates square = board // [(coordinates, square)]
 
 addPiece :: Board -> Coordinates -> Piece -> Board
-addPiece = undefined
+addPiece board coordinates piece = updateBoard board coordinates (Square piece)
 
 removePiece :: Board -> Coordinates -> Board
-removePiece = undefined
+removePiece board coordinates = updateBoard board coordinates Empty
 
 movePiece :: Board -> Coordinates -> Coordinates -> Board
-movePiece = undefined
+movePiece board start end = addPiece board' end piece
+    where board' = removePiece board start
+          (Just piece) = getPiece board start
 
 iterateDirection' :: Board -> Color -> Coordinates -> Coordinates -> [Coordinates] -> [Coordinates]
 iterateDirection' board color square@(x, y) direction@(dx ,dy) squares
