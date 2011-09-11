@@ -1,7 +1,8 @@
 module Piece (Piece(..), Color(..), Type(..),
-              printPiece, printBigPiece, moveDirections, moveSquares, attackSquares, opponent) where
+              printPiece, printBigPiece, moveDirections, moveSquares, attackSquares, opponent, parsePiece) where
 
 import Data.Char
+import Data.List
 
 data Piece = Piece Type Color
              deriving (Eq, Show, Read)
@@ -30,6 +31,14 @@ printBigPiece p@(Piece _ color) = case color of
                                   White -> toUpper (printPiece p) : "W"
                                   Black -> toUpper (printPiece p) : "B"
 
+parsePiece :: Char -> Maybe Piece
+parsePiece c = do
+  pieceType <- rlookup (toUpper c) pieceChars
+  case isUpper c of
+    True -> return (Piece pieceType White)
+    False -> return (Piece pieceType Black)
+    where rlookup x = lookup x . map swap
+          swap (x, y) = (y, x)
 
 diagonal :: [(Int, Int)]
 diagonal = [(-1, -1), (-1, 1), (1, 1), (1, -1)]
