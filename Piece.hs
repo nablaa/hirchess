@@ -1,4 +1,5 @@
-module Piece (Piece(..), Color(..), Type(..), printPiece, printBigPiece, moveSquares, attackSquares) where
+module Piece (Piece(..), Color(..), Type(..),
+              printPiece, printBigPiece, moveDirections, moveSquares, attackSquares, opponent) where
 
 import Data.Char
 
@@ -13,6 +14,10 @@ data Type = Pawn | Knight | Bishop | Rook | Queen | King
 
 pieceChars :: [(Type, Char)]
 pieceChars = [(Pawn, 'P'), (Knight, 'N'), (Bishop, 'B'), (Rook, 'R'), (Queen, 'Q'), (King, 'K')]
+
+opponent :: Color -> Color
+opponent White = Black
+opponent Black = White
 
 printPiece :: Piece -> Char
 printPiece (Piece t color) = case color of
