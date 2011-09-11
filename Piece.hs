@@ -26,6 +26,21 @@ printBigPiece p@(Piece _ color) = case color of
                                   Black -> toUpper (printPiece p) : "B"
 
 
+diagonal :: [(Int, Int)]
+diagonal = [(-1, -1), (-1, 1), (1, 1), (1, -1)]
+
+perpendicular :: [(Int, Int)]
+perpendicular = [(-1, 0), (0, 1), (1, 0), (0, -1)]
+
+moveDirections :: Piece -> [(Int, Int)]
+moveDirections (Piece Pawn White) = [(-1, 0)]
+moveDirections (Piece Pawn Black) = [(1, 0)]
+moveDirections (Piece Knight _) = [(i, j) | i <- [-2..2], j <- [-2..2], (i /= 0 || j /= 0) && not (abs (i - j) == 0 || abs (i + j) == 0 || i == 0 || j == 0)]
+moveDirections (Piece Bishop _) = diagonal
+moveDirections (Piece Rook _) = perpendicular
+moveDirections (Piece Queen _) = perpendicular ++ diagonal
+moveDirections (Piece King _) = perpendicular ++ diagonal
+
 moveSquaresDiff :: Piece -> [(Int, Int)]
 moveSquaresDiff (Piece King _) = [(i, j) | i <- [-1..1], j <- [-1..1], i /= 0 || j /= 0]
 moveSquaresDiff (Piece Queen _) = [(i, j) | i <- [-8..8], j <- [-8..8], (i /= 0 || j /= 0) && (abs (i - j) == 0 || abs (i + j) == 0 || i == 0 || j == 0)]
