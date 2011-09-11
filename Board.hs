@@ -1,4 +1,4 @@
-module Board (Board, Coordinates, initialBoard,
+module Board (Board, Coordinates, initialBoard, emptyBoard,
               printBoard, printPrettyBoard, printBigPrettyBoard, printSquares,
               canMove, canCapture, getPlayer, isColor, getReachable, addPiece, removePiece, movePiece) where
 
