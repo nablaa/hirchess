@@ -86,6 +86,8 @@ canMove board piece start end = isInsideBoard start && isInsideBoard end
                                 && isEmpty board end && end `elem` getReachable board piece start
 
 canCapture :: Board -> Piece -> Coordinates -> Coordinates -> Bool
+canCapture board piece@(Piece Pawn color) start end = isInsideBoard start && isInsideBoard end
+                                                      && isColor board end (opponent color) && end `elem` attackSquares start piece
 canCapture board piece@(Piece _ color) start end = isInsideBoard start && isInsideBoard end
                                                   && isColor board end (opponent color) && end `elem` getReachable board piece start
 
