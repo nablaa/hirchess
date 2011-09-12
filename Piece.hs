@@ -1,5 +1,6 @@
-module Piece (Piece(..), Color(..), Type(..),
-              printPiece, printBigPiece, moveDirections, moveSquares, attackSquares, opponent, parsePiece) where
+module Piece (Piece(..), Color(..), Type(..), Castling(..),
+              printPiece, printBigPiece, moveDirections, moveSquares, attackSquares, opponent, parsePiece,
+              getEnPassantTargetSquare, getCastling, getCastlingSquares) where
 
 import Data.Char
 import Data.List
@@ -12,6 +13,9 @@ data Color = White | Black
 
 data Type = Pawn | Knight | Bishop | Rook | Queen | King
             deriving (Eq, Show, Read)
+
+data Castling = Long Color | Short Color
+                deriving (Eq, Show, Read)
 
 pieceChars :: [(Type, Char)]
 pieceChars = [(Pawn, 'P'), (Knight, 'N'), (Bishop, 'B'), (Rook, 'R'), (Queen, 'Q'), (King, 'K')]
@@ -79,3 +83,20 @@ moveSquares square piece = fromDiff moveSquaresDiff square piece
 
 attackSquares :: (Int, Int) -> Piece -> [(Int, Int)]
 attackSquares = fromDiff attackSquaresDiff
+
+getEnPassantTargetSquare :: (Int, Int) -> Color -> (Int, Int)
+getEnPassantTargetSquare (x, y) White = (x - 1, y)
+getEnPassantTargetSquare (x, y) Black = (x + 1, y)
+
+getCastling :: Color -> (Int, Int) -> (Int, Int) -> Maybe Castling
+getCastling White (7, 4) (7, 0) = Just (Long White)
+getCastling White (7, 4) (7, 7) = Just (Short White)
+getCastling Black (0, 4) (0, 0) = Just (Long Black)
+getCastling Black (0, 4) (0, 7) = Just (Short Black)
+getCastling _ _ _ = Nothing
+
+getCastlingSquares :: Castling -> [(Int, Int)]
+getCastlingSquares (Long White) = [(7, y) | y <- [0..4]]
+getCastlingSquares (Short White) = [(7, y) | y <- [4..7]]
+getCastlingSquares (Long Black) = [(0, y) | y <- [0..4]]
+getCastlingSquares (Short Black) = [(0, y) | y <- [4..7]]
