@@ -1,7 +1,7 @@
 module Board (Board, Coordinates, initialBoard, emptyBoard,
               printBoard, parseBoard, printPrettyBoard, printBigPrettyBoard, printSquares,
-              canMove, canCapture, getPlayer, isColor, getReachable, addPiece, removePiece, movePiece,
-              addPieces, debugPrint) where
+              canMove, canCapture, getPiece, getPlayer, isColor, getReachable, addPiece, removePiece, movePiece,
+              addPieces, isChecked, isEmpty, debugPrint) where
 
 import Data.Char
 import Data.Maybe
@@ -86,10 +86,21 @@ canMove board piece start end = isInsideBoard start && isInsideBoard end
                                 && isEmpty board end && end `elem` getReachable board piece start
 
 canCapture :: Board -> Piece -> Coordinates -> Coordinates -> Bool
-canCapture board piece@(Piece Pawn color) start end = isInsideBoard start && isInsideBoard end
-                                                      && isColor board end (opponent color) && end `elem` attackSquares start piece
-canCapture board piece@(Piece _ color) start end = isInsideBoard start && isInsideBoard end
-                                                  && isColor board end (opponent color) && end `elem` getReachable board piece start
+canCapture board (Piece _ color) start end = isColor board end (opponent color) && threatens board end start
+
+threatens :: Board -> Coordinates -> Coordinates -> Bool
+threatens board end start = case piece of
+                              Piece Pawn color -> isInsideBoard start && isInsideBoard end && end `elem` attackSquares start piece
+                              _ -> isInsideBoard start && isInsideBoard end && end `elem` getReachable board piece start
+    where (Just piece) = getPiece board start
+
+isChecked :: Board -> Color -> Coordinates -> Bool
+isChecked board player square = any (threatens board square) opponentSquares
+    where allSquares = indices board
+          opponentSquares = filter filterOpponent allSquares
+          filterOpponent x = case getPiece board x of
+                               Just (Piece _ color) -> color == opponent player
+                               Nothing -> False
 
 squareToChar :: Square -> Char
 squareToChar Empty = ' '
