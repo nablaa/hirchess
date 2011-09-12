@@ -124,8 +124,10 @@ parseBoard' [] = []
 parseBoard' ('\n':xs) = parseBoard' xs
 parseBoard' (x:xs) = parsePiece x : parseBoard' xs
 
-parseBoard :: String -> Board
-parseBoard str = boardFromPieces $ parseBoard' str
+parseBoard :: String -> Maybe Board
+parseBoard str | length pieces == 64 = Just $ boardFromPieces pieces
+               | otherwise = Nothing
+    where pieces = parseBoard' str
 
 debugPrint :: Board -> IO ()
 debugPrint = putStrLn . printBigPrettyBoard
