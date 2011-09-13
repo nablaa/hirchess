@@ -1,4 +1,4 @@
-module Move (GameState, Move, getMove) where
+module Move (GameState, Move(..), MoveType(..), getMove, longAlgebraicNotation) where
 
 import Data.Maybe
 import Data.List
@@ -94,3 +94,19 @@ getEnPassantMove (State board player _ (Just square) _ _) start end
           targetPiece = getPiece board targetSquare
 getEnPassantMove (State board _ _ _ _ _) start end = Just $ Move EnPassant piece start end
     where (Just piece) = getPiece board start
+
+
+longAlgebraicNotation' :: Move -> String -> String
+longAlgebraicNotation' (Move _ (Piece pieceType _) start end) separator = pieceStr ++ startStr ++ separator ++ endStr
+    where pieceStr = pieceTypeString pieceType
+          startStr = coordinatesToString start
+          endStr = coordinatesToString end
+
+longAlgebraicNotation :: Move -> String
+longAlgebraicNotation move@(Move Movement _ _ _) = longAlgebraicNotation' move "-"
+longAlgebraicNotation move@(Move Capture _ _ _) = longAlgebraicNotation' move "x"
+longAlgebraicNotation (Move (Castling (Long _)) _ _ _) = "O-O-O"
+longAlgebraicNotation (Move (Castling (Short _)) _ _ _) = "O-O"
+longAlgebraicNotation move@(Move EnPassant _ _ _) = longAlgebraicNotation' move "x"
+longAlgebraicNotation move@(Move (Promotion promoted) _ _ _) = longAlgebraicNotation' move "-" ++ pieceTypeString promoted
+longAlgebraicNotation move@(Move PawnDoubleMove _ _ _) = longAlgebraicNotation' move "-"
