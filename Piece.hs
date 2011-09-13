@@ -1,6 +1,6 @@
 module Piece (Piece(..), Color(..), Type(..), Castling(..),
               printPiece, printBigPiece, moveDirections, moveSquares, attackSquares, opponent, parsePiece,
-              getEnPassantTargetSquare, getCastling, getCastlingSquares) where
+              getEnPassantTargetSquare, getCastling, getCastlingSquares, isPromotionSquare) where
 
 import Data.Char
 import Data.List
@@ -100,3 +100,8 @@ getCastlingSquares (Long White) = [(7, y) | y <- [0..4]]
 getCastlingSquares (Short White) = [(7, y) | y <- [4..7]]
 getCastlingSquares (Long Black) = [(0, y) | y <- [0..4]]
 getCastlingSquares (Short Black) = [(0, y) | y <- [4..7]]
+
+isPromotionSquare :: (Int, Int) -> Color -> Bool
+isPromotionSquare (0, _) White = True
+isPromotionSquare (7, _) Black = True
+isPromotionSquare _ _ = False

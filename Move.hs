@@ -1,11 +1,15 @@
-module Move (GameState, Move) where
+module Move (GameState, Move, getMove) where
 
+import Data.Maybe
 import Data.List
 import Board
 import Piece
 
 data Move = Move MoveType Piece Coordinates Coordinates
+            deriving (Eq, Show, Read)
+
 data MoveType = Movement | Capture | Castling | EnPassant | Promotion Type | PawnDoubleMove
+                deriving (Eq, Show, Read)
 
 data GameState = State {
       board :: Board
@@ -17,15 +21,49 @@ data GameState = State {
     } deriving (Eq, Show, Read)
 
 
-canCastle :: GameState -> Coordinates -> Coordinates -> Bool
-canCastle (State _ _ [] _ _ _) _ _ = False
-canCastle (State board player castlings _ _ _) start end
-    | startPiece /= Just (Piece King player) = False
-    | endPiece /= Just (Piece Rook player) = False
-    | castling' == Nothing = False
-    | not $ castling `elem` castlings = False
-    | any (isChecked board player) squares = False
-    | not $ all (isEmpty board) (squares \\ [start, end]) = False
+changeToPromotionMove :: Move -> Move
+changeToPromotionMove (Move Movement piece@(Piece Pawn color) start end) | isPromotionSquare end color = (Move (Promotion Queen) piece start end)
+changeToPromotionMove move = move
+
+getMove :: GameState -> Coordinates -> Coordinates -> Maybe Move
+getMove state@(State board player castlings enpassant _ _) start end | piece == Nothing = Nothing
+                                                                     | color /= (Just player) = Nothing
+                                                                     | null moves = Nothing
+                                                                     | length moves > 1 = error $ "Too many possible moves: " ++ show moves
+                                                                     | length moves == 1 = Just $ changeToPromotionMove $ head moves
+    where piece = getPiece board start
+          color = getPlayer board start
+          moves = catMaybes[getMovementMove state start end,
+                            getCaptureMove state start end,
+                            getCastleMove state start end,
+                            getEnPassantMove state start end]
+
+isPossibleMove :: GameState -> Move -> Bool
+isPossibleMove state move@(Move _ _ start end) = generatedMove /= Nothing && fromJust generatedMove == move
+    where generatedMove = getMove state start end
+
+isLegalMove :: GameState -> Move -> Bool
+isLegalMove = undefined
+
+getMovementMove :: GameState -> Coordinates -> Coordinates -> Maybe Move
+getMovementMove (State board _ _ _ _ _) start end | canMove board piece start end = Just $ Move Movement piece start end
+                                                       | otherwise = Nothing
+                                                       where (Just piece) = getPiece board start
+
+getCaptureMove :: GameState -> Coordinates -> Coordinates -> Maybe Move
+getCaptureMove (State board _ _ _ _ _) start end | canCapture board piece start end = Just $ Move Capture piece start end
+                                                 | otherwise = Nothing
+                                                 where (Just piece) = getPiece board start
+
+getCastleMove :: GameState -> Coordinates -> Coordinates -> Maybe Move
+getCastleMove (State _ _ [] _ _ _) _ _ = Nothing
+getCastleMove (State board player castlings _ _ _) start end
+    | startPiece /= Just (Piece King player) = Nothing
+    | endPiece /= Just (Piece Rook player) = Nothing
+    | castling' == Nothing = Nothing
+    | not $ castling `elem` castlings = Nothing
+    | any (isChecked board player) squares = Nothing
+    | not $ all (isEmpty board) (squares \\ [start, end]) = Nothing
     where startPiece = getPiece board start
           endPiece = getPiece board end
           (Just king) = startPiece
@@ -33,19 +71,21 @@ canCastle (State board player castlings _ _ _) start end
           castling' = getCastling player start end
           (Just castling) = castling'
           squares = getCastlingSquares castling
-canCastle _ _ _ = True
+getCastleMove (State board _ _ _ _ _) start end = Just $ Move Castling piece start end
+    where (Just piece) = getPiece board start
 
-canEnPassant :: GameState -> Coordinates -> Coordinates -> Bool
-canEnPassant (State _ _ _ Nothing _ _) _ _ = False
-canEnPassant (State board player _ (Just square) _ _) start end
-    | startPiece /= Just (Piece Pawn player) = False
-    | endPiece /= Nothing = False
-    | not $ end `elem` attackSquares start piece = False
-    | targetSquare /= square = False
-    | targetPiece /= Just (Piece Pawn (opponent player)) = False
+getEnPassantMove :: GameState -> Coordinates -> Coordinates -> Maybe Move
+getEnPassantMove (State _ _ _ Nothing _ _) _ _ = Nothing
+getEnPassantMove (State board player _ (Just square) _ _) start end
+    | startPiece /= Just (Piece Pawn player) = Nothing
+    | endPiece /= Nothing = Nothing
+    | not $ end `elem` attackSquares start piece = Nothing
+    | targetSquare /= square = Nothing
+    | targetPiece /= Just (Piece Pawn (opponent player)) = Nothing
     where startPiece = getPiece board start
           (Just piece) = startPiece
           endPiece = getPiece board end
           targetSquare = getEnPassantTargetSquare end player
           targetPiece = getPiece board targetSquare
-canEnPassant _ _ _ = True
+getEnPassantMove (State board _ _ _ _ _) start end = Just $ Move EnPassant piece start end
+    where (Just piece) = getPiece board start
