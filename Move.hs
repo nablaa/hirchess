@@ -25,12 +25,16 @@ changeToPromotionMove :: Move -> Move
 changeToPromotionMove (Move Movement piece@(Piece Pawn color) start end) | isPromotionSquare end color = (Move (Promotion Queen) piece start end)
 changeToPromotionMove move = move
 
+changeToPawnDoubleMove :: Move -> Move
+changeToPawnDoubleMove (Move Movement piece@(Piece Pawn color) start end) | isDoubleMove start end color = (Move PawnDoubleMove piece start end)
+changeToPawnDoubleMove move = move
+
 getMove :: GameState -> Coordinates -> Coordinates -> Maybe Move
 getMove state@(State board player castlings enpassant _ _) start end | piece == Nothing = Nothing
                                                                      | color /= (Just player) = Nothing
                                                                      | null moves = Nothing
                                                                      | length moves > 1 = error $ "Too many possible moves: " ++ show moves
-                                                                     | length moves == 1 = Just $ changeToPromotionMove $ head moves
+                                                                     | length moves == 1 = Just $ changeToPawnDoubleMove $ changeToPromotionMove $ head moves
     where piece = getPiece board start
           color = getPlayer board start
           moves = catMaybes[getMovementMove state start end,
@@ -47,7 +51,7 @@ isLegalMove = undefined
 
 getMovementMove :: GameState -> Coordinates -> Coordinates -> Maybe Move
 getMovementMove (State board _ _ _ _ _) start end | canMove board piece start end = Just $ Move Movement piece start end
-                                                       | otherwise = Nothing
+                                                  | otherwise = Nothing
                                                        where (Just piece) = getPiece board start
 
 getCaptureMove :: GameState -> Coordinates -> Coordinates -> Maybe Move

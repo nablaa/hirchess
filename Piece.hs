@@ -110,3 +110,8 @@ isPromotionSquare :: (Int, Int) -> Color -> Bool
 isPromotionSquare (0, _) White = True
 isPromotionSquare (7, _) Black = True
 isPromotionSquare _ _ = False
+
+isDoubleMove :: (Int, Int) -> (Int, Int) -> Color -> Bool
+isDoubleMove (6, _) (4, _) White = True
+isDoubleMove (1, _) (3, _) Black = True
+isDoubleMove _ _ _ = False
