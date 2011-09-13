@@ -8,7 +8,7 @@ import Piece
 data Move = Move MoveType Piece Coordinates Coordinates
             deriving (Eq, Show, Read)
 
-data MoveType = Movement | Capture | Castling | EnPassant | Promotion Type | PawnDoubleMove
+data MoveType = Movement | Capture | Castling Castling | EnPassant | Promotion Type | PawnDoubleMove
                 deriving (Eq, Show, Read)
 
 data GameState = State {
@@ -71,8 +71,9 @@ getCastleMove (State board player castlings _ _ _) start end
           castling' = getCastling player start end
           (Just castling) = castling'
           squares = getCastlingSquares castling
-getCastleMove (State board _ _ _ _ _) start end = Just $ Move Castling piece start end
+getCastleMove (State board player _ _ _ _) start end = Just $ Move (Castling castling) piece start end
     where (Just piece) = getPiece board start
+          (Just castling) = getCastling player start end
 
 getEnPassantMove :: GameState -> Coordinates -> Coordinates -> Maybe Move
 getEnPassantMove (State _ _ _ Nothing _ _) _ _ = Nothing
