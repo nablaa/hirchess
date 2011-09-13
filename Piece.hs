@@ -1,7 +1,8 @@
 module Piece (Piece(..), Color(..), Type(..), Castling(..),
               printPiece, printBigPiece, moveDirections, moveSquares, attackSquares, opponent, parsePiece,
-              getEnPassantTargetSquare, getCastling, getCastlingSquares, isPromotionSquare) where
+              getEnPassantTargetSquare, getCastling, getCastlingSquares, isPromotionSquare, pieceTypeString, isDoubleMove) where
 
+import Data.Maybe
 import Data.Char
 import Data.List
 
@@ -23,6 +24,10 @@ pieceChars = [(Pawn, 'P'), (Knight, 'N'), (Bishop, 'B'), (Rook, 'R'), (Queen, 'Q
 opponent :: Color -> Color
 opponent White = Black
 opponent Black = White
+
+pieceTypeString :: Type -> String
+pieceTypeString Pawn = ""
+pieceTypeString t = [fromJust $ lookup t pieceChars]
 
 printPiece :: Piece -> Char
 printPiece (Piece t color) = case color of

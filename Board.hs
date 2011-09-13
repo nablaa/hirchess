@@ -1,7 +1,7 @@
 module Board (Board, Coordinates, initialBoard, emptyBoard,
               printBoard, parseBoard, printPrettyBoard, printBigPrettyBoard, printSquares,
               canMove, canCapture, getPiece, getPlayer, isColor, getReachable, addPiece, removePiece, movePiece,
-              addPieces, isChecked, isEmpty, debugPrint) where
+              addPieces, isChecked, isEmpty, debugPrint, coordinatesToString) where
 
 import Data.Char
 import Data.Maybe
@@ -149,3 +149,6 @@ boardFromPieces :: [Maybe Piece] -> Board
 boardFromPieces pieces = listArray ((0, 0), (7, 7)) $ map f pieces
     where f (Just piece) = Square piece
           f Nothing = Empty
+
+coordinatesToString :: Coordinates -> String
+coordinatesToString (r, c) = [chr (ord 'a' + c), intToDigit (8 - r)]
