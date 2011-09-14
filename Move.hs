@@ -1,5 +1,5 @@
 module Move (GameState(..), Move(..), MoveType(..),
-             getMove, getAllLegalMoves, longAlgebraicNotation) where
+             getMove, getAllLegalMoves, longAlgebraicNotation, debugPrintMoves) where
 
 import Data.Maybe
 import Data.List
@@ -115,3 +115,6 @@ longAlgebraicNotation (Move (Castling (Short _)) _ _ _) = "O-O"
 longAlgebraicNotation move@(Move EnPassant _ _ _) = longAlgebraicNotation' move "x"
 longAlgebraicNotation move@(Move (Promotion promoted) _ _ _) = longAlgebraicNotation' move "-" ++ pieceTypeString promoted
 longAlgebraicNotation move@(Move PawnDoubleMove _ _ _) = longAlgebraicNotation' move "-"
+
+debugPrintMoves :: [Move] -> IO ()
+debugPrintMoves = mapM_ (putStrLn . longAlgebraicNotation)
