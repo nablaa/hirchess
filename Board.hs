@@ -1,7 +1,7 @@
 module Board (Board, Coordinates, initialBoard, emptyBoard,
               printBoard, parseBoard, printPrettyBoard, printBigPrettyBoard, printSquares,
               canMove, canCapture, getPiece, getPlayer, isColor, getReachable, addPiece, removePiece, movePiece,
-              addPieces, isChecked, isEmpty, debugPrintBoard, coordinatesToString) where
+              addPieces, isChecked, isEmpty, debugPrintBoard, coordinatesToString, allCoordinates) where
 
 import Data.Char
 import Data.Maybe
@@ -24,6 +24,9 @@ initialBoard = listArray ((0, 0), (7, 7)) rows
 
 emptyBoard :: Board
 emptyBoard = listArray ((0, 0), (7, 7)) (repeat Empty)
+
+allCoordinates :: [Coordinates]
+allCoordinates = indices $ emptyBoard
 
 getPiece :: Board -> Coordinates -> Maybe Piece
 getPiece board coordinates | inRange (bounds board) coordinates = f $ board ! coordinates

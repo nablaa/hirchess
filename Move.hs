@@ -1,4 +1,5 @@
-module Move (GameState, Move(..), MoveType(..), getMove, longAlgebraicNotation) where
+module Move (GameState(..), Move(..), MoveType(..),
+             getMove, getAllLegalMoves, longAlgebraicNotation) where
 
 import Data.Maybe
 import Data.List
@@ -29,6 +30,9 @@ changeToPawnDoubleMove :: Move -> Move
 changeToPawnDoubleMove (Move Movement piece@(Piece Pawn color) start end) | isDoubleMove start end color = (Move PawnDoubleMove piece start end)
 changeToPawnDoubleMove move = move
 
+getAllLegalMoves :: GameState -> [Move]
+getAllLegalMoves state = filter (isLegalMove state) $ catMaybes [getMove state start end | start <- allCoordinates, end <- allCoordinates]
+
 getMove :: GameState -> Coordinates -> Coordinates -> Maybe Move
 getMove state@(State board player castlings enpassant _ _) start end | piece == Nothing = Nothing
                                                                      | color /= (Just player) = Nothing
@@ -47,7 +51,8 @@ isPossibleMove state move@(Move _ _ start end) = generatedMove /= Nothing && fro
     where generatedMove = getMove state start end
 
 isLegalMove :: GameState -> Move -> Bool
-isLegalMove = undefined
+isLegalMove _ _ = True
+
 
 getMovementMove :: GameState -> Coordinates -> Coordinates -> Maybe Move
 getMovementMove (State board _ _ _ _ _) start end | canMove board piece start end = Just $ Move Movement piece start end
