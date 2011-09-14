@@ -1,7 +1,7 @@
 module Board (Board, Coordinates, initialBoard, emptyBoard,
               printBoard, parseBoard, printPrettyBoard, printBigPrettyBoard, printSquares,
               canMove, canCapture, getPiece, getPlayer, isColor, getReachable, addPiece, removePiece, movePiece,
-              addPieces, isChecked, isEmpty, debugPrint, coordinatesToString) where
+              addPieces, isChecked, isEmpty, debugPrintBoard, coordinatesToString) where
 
 import Data.Char
 import Data.Maybe
@@ -142,8 +142,8 @@ parseBoard str | length pieces == 64 = Just $ boardFromPieces pieces
                | otherwise = Nothing
     where pieces = parseBoard' str
 
-debugPrint :: Board -> IO ()
-debugPrint = putStrLn . printBigPrettyBoard
+debugPrintBoard :: Board -> IO ()
+debugPrintBoard = putStrLn . printBigPrettyBoard
 
 boardFromPieces :: [Maybe Piece] -> Board
 boardFromPieces pieces = listArray ((0, 0), (7, 7)) $ map f pieces
