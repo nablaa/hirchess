@@ -9,7 +9,7 @@ import Piece
 data Move = Move MoveType Piece Coordinates Coordinates
             deriving (Eq, Show, Read)
 
-data MoveType = Movement | Capture | Castling Castling | EnPassant | Promotion Type | PawnDoubleMove
+data MoveType = Movement | Capture | Castling Castling | EnPassant Coordinates | Promotion Piece | PawnDoubleMove
                 deriving (Eq, Show, Read)
 
 data GameState = State {
@@ -23,7 +23,7 @@ data GameState = State {
 
 -- TODO Fix: queen
 changeToPromotionMove :: Move -> Move
-changeToPromotionMove (Move _ piece@(Piece Pawn color) start end) | isPromotionSquare end color = Move (Promotion Queen) piece start end
+changeToPromotionMove (Move _ piece@(Piece Pawn color) start end) | isPromotionSquare end color = Move (Promotion (Piece Queen color)) piece start end
 changeToPromotionMove move = move
 
 changeToPawnDoubleMove :: Move -> Move
@@ -97,8 +97,9 @@ getEnPassantMove (State board player _ (Just square) _ _) start end
           endPiece = getPiece board end
           targetSquare = getEnPassantTargetSquare end player
           targetPiece = getPiece board targetSquare
-getEnPassantMove (State board _ _ _ _ _) start end = Just $ Move EnPassant piece start end
+getEnPassantMove (State board player _ _ _ _) start end = Just $ Move (EnPassant targetSquare) piece start end
     where (Just piece) = getPiece board start
+          targetSquare = getEnPassantTargetSquare end player
 
 
 longAlgebraicNotation' :: Move -> String -> String
@@ -112,8 +113,8 @@ longAlgebraicNotation move@(Move Movement _ _ _) = longAlgebraicNotation' move "
 longAlgebraicNotation move@(Move Capture _ _ _) = longAlgebraicNotation' move "x"
 longAlgebraicNotation (Move (Castling (Long _)) _ _ _) = "O-O-O"
 longAlgebraicNotation (Move (Castling (Short _)) _ _ _) = "O-O"
-longAlgebraicNotation move@(Move EnPassant _ _ _) = longAlgebraicNotation' move "x"
-longAlgebraicNotation move@(Move (Promotion promoted) _ _ _) = longAlgebraicNotation' move "-" ++ pieceTypeString promoted
+longAlgebraicNotation move@(Move (EnPassant _) _ _ _) = longAlgebraicNotation' move "x"
+longAlgebraicNotation move@(Move (Promotion (Piece promoted _)) _ _ _) = longAlgebraicNotation' move "-" ++ pieceTypeString promoted
 longAlgebraicNotation move@(Move PawnDoubleMove _ _ _) = longAlgebraicNotation' move "-"
 
 debugPrintMoves :: [Move] -> IO ()
