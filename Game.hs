@@ -5,7 +5,7 @@ import Piece
 import Move
 
 initialState :: GameState
-initialState = (State initialBoard White initialCastlings Nothing 0 1)
+initialState = State initialBoard White initialCastlings Nothing 0 1
     where initialCastlings = [Long White, Short White, Long Black, Short Black]
 
 hasEnded :: GameState -> Bool

@@ -38,7 +38,7 @@ allSquares = do
   return (x, y)
 
 
-prop_pawnDoubleMove' column piece start end = canMove initialBoard piece (start, column) (end, column) == True
+prop_pawnDoubleMove' column piece start end = canMove initialBoard piece (start, column) (end, column)
 
 prop_pawnDoubleMove (Coordinate column) color = case color of
                                                   White -> prop_pawnDoubleMove' column (Piece Pawn White) 6 4
@@ -49,7 +49,7 @@ equal a b = nub (sort a) == nub (sort b)
 prop_crosscheckMoveSquares (Coordinate x, Coordinate y) pieceType color
     = equal (moveSquares coordinates piece) (getReachable emptyBoard piece coordinates)
       where coordinates = (x, y)
-            piece = (Piece pieceType color)
+            piece = Piece pieceType color
 
 
 {-
@@ -72,11 +72,11 @@ prop_crosscheckMoveSquares (Coordinate x, Coordinate y) pieceType color
    +----+----+----+----+----+----+----+----+
      a    b    c    d    e    f    g    h
 -}
-test_queenMove = equal squares moveable
+testQueenMove = equal squares moveable
     where board = addPieces emptyBoard [(start, piece),
                                         ((1, 4), (Piece Knight Black)),
                                         ((6, 1), (Piece King White))]
-          piece = (Piece Queen White)
+          piece = Piece Queen White
           start = (4, 1)
           moveable = [(0, 1), (1, 1), (2, 1), (2, 3), (3, 0), (3, 1), (3, 2), (4, 0), (4, 2), (4, 3), (4, 4), (4, 5), (4, 6), (4, 7), (5, 0), (5, 1), (5, 2), (6, 3), (7, 4)]
           squares = filter (canMove board piece start) allSquares
@@ -87,9 +87,8 @@ options = TestOptions
           , length_of_tests     = 1
           , debug_tests         = False }
 
-main = do
-  runTests "complex" options
+main = runTests "complex" options
        [ run prop_pawnDoubleMove
        , run prop_crosscheckMoveSquares
-       , run test_queenMove
+       , run testQueenMove
         ]

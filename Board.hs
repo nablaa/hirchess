@@ -26,7 +26,7 @@ emptyBoard :: Board
 emptyBoard = listArray ((0, 0), (7, 7)) (repeat Empty)
 
 allCoordinates :: [Coordinates]
-allCoordinates = indices $ emptyBoard
+allCoordinates = indices emptyBoard
 
 getPiece :: Board -> Coordinates -> Maybe Piece
 getPiece board coordinates | inRange (bounds board) coordinates = f $ board ! coordinates
@@ -52,7 +52,7 @@ updateBoard :: Board -> Coordinates -> Square -> Board
 updateBoard board coordinates square = board // [(coordinates, square)]
 
 addPiece :: Board -> Coordinates -> Piece -> Board
-addPiece board coordinates piece = updateBoard board coordinates (Square piece)
+addPiece board coordinates = updateBoard board coordinates . Square
 
 removePiece :: Board -> Coordinates -> Board
 removePiece board coordinates = updateBoard board coordinates Empty
@@ -111,7 +111,7 @@ squareToChar (Square p) = printPiece p
 
 printBoard :: Board -> String
 printBoard board = toLines $ foldr f "" (elems board)
-    where f sq str = squareToChar sq : str
+    where f = (:) . squareToChar
           toLines [] = []
           toLines str = take 8 str ++ "\n" ++ toLines (drop 8 str)
 

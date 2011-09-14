@@ -21,12 +21,13 @@ data GameState = State {
     , moveNumber :: Integer
     } deriving (Eq, Show, Read)
 
+-- TODO Fix: queen
 changeToPromotionMove :: Move -> Move
-changeToPromotionMove (Move _ piece@(Piece Pawn color) start end) | isPromotionSquare end color = (Move (Promotion Queen) piece start end)
+changeToPromotionMove (Move _ piece@(Piece Pawn color) start end) | isPromotionSquare end color = Move (Promotion Queen) piece start end
 changeToPromotionMove move = move
 
 changeToPawnDoubleMove :: Move -> Move
-changeToPawnDoubleMove (Move Movement piece@(Piece Pawn color) start end) | isDoubleMove start end color = (Move PawnDoubleMove piece start end)
+changeToPawnDoubleMove (Move Movement piece@(Piece Pawn color) start end) | isDoubleMove start end color = Move PawnDoubleMove piece start end
 changeToPawnDoubleMove move = move
 
 getAllLegalMoves :: GameState -> [Move]
@@ -34,7 +35,7 @@ getAllLegalMoves state = filter (isLegalMove state) $ catMaybes [getMove state s
 
 getMove :: GameState -> Coordinates -> Coordinates -> Maybe Move
 getMove state@(State board player castlings enpassant _ _) start end | piece == Nothing = Nothing
-                                                                     | color /= (Just player) = Nothing
+                                                                     | color /= Just player = Nothing
                                                                      | null moves = Nothing
                                                                      | length moves > 1 = error $ "Too many possible moves: " ++ show moves
                                                                      | length moves == 1 = Just $ changeToPawnDoubleMove $ changeToPromotionMove $ head moves
@@ -69,7 +70,7 @@ getCastleMove (State board player castlings _ _ _) start end
     | startPiece /= Just (Piece King player) = Nothing
     | endPiece /= Just (Piece Rook player) = Nothing
     | castling' == Nothing = Nothing
-    | not $ castling `elem` castlings = Nothing
+    | castling `notElem` castlings = Nothing
     | any (isChecked board player) squares = Nothing
     | not $ all (isEmpty board) (squares \\ [start, end]) = Nothing
     where startPiece = getPiece board start
@@ -88,7 +89,7 @@ getEnPassantMove (State _ _ _ Nothing _ _) _ _ = Nothing
 getEnPassantMove (State board player _ (Just square) _ _) start end
     | startPiece /= Just (Piece Pawn player) = Nothing
     | endPiece /= Nothing = Nothing
-    | not $ end `elem` attackSquares start piece = Nothing
+    | end `notElem` attackSquares start piece = Nothing
     | targetSquare /= square = Nothing
     | targetPiece /= Just (Piece Pawn (opponent player)) = Nothing
     where startPiece = getPiece board start

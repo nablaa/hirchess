@@ -43,9 +43,7 @@ printBigPiece p@(Piece _ color) = case color of
 parsePiece :: Char -> Maybe Piece
 parsePiece c = do
   pieceType <- rlookup (toUpper c) pieceChars
-  case isUpper c of
-    True -> return (Piece pieceType White)
-    False -> return (Piece pieceType Black)
+  if isUpper c then return (Piece pieceType White) else return (Piece pieceType Black)
     where rlookup x = lookup x . map swap
           swap (x, y) = (y, x)
 
@@ -79,7 +77,7 @@ attackSquaresDiff (Piece Pawn Black) = [(1, -1), (1, 1)]
 attackSquaresDiff piece = moveSquaresDiff piece
 
 fromDiff :: (Piece -> [(Int, Int)]) -> (Int, Int) -> Piece -> [(Int, Int)]
-fromDiff f (cx, cy) piece = filter (\(x, y) -> x >= 0 && y >= 0 && x <= 7 && y <= 7) $ map (\(x, y) -> (x + cx, y + cy)) (f piece)
+fromDiff f (cx, cy) = filter (\(x, y) -> x >= 0 && y >= 0 && x <= 7 && y <= 7) . map (\(x, y) -> (x + cx, y + cy)) . f
 
 moveSquares :: (Int, Int) -> Piece -> [(Int, Int)]
 moveSquares (6, y) (Piece Pawn White) = [(5, y), (4, y)]
