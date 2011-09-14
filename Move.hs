@@ -21,9 +21,8 @@ data GameState = State {
     , moveNumber :: Integer
     } deriving (Eq, Show, Read)
 
-
 changeToPromotionMove :: Move -> Move
-changeToPromotionMove (Move Movement piece@(Piece Pawn color) start end) | isPromotionSquare end color = (Move (Promotion Queen) piece start end)
+changeToPromotionMove (Move _ piece@(Piece Pawn color) start end) | isPromotionSquare end color = (Move (Promotion Queen) piece start end)
 changeToPromotionMove move = move
 
 changeToPawnDoubleMove :: Move -> Move
