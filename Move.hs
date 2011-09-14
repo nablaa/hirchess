@@ -51,7 +51,19 @@ isPossibleMove state move@(Move _ _ start end) = generatedMove /= Nothing && fro
     where generatedMove = getMove state start end
 
 isLegalMove :: GameState -> Move -> Bool
-isLegalMove _ _ = True
+isLegalMove state@(State board player _ _ _ _) move = not (isCheck newBoard player) && isPossibleMove state move
+    where newBoard = applyMoveBoard board move
+
+applyMoveBoard :: Board -> Move -> Board
+applyMoveBoard board (Move Movement _ start end) = movePiece board start end
+applyMoveBoard board (Move Capture _ start end) = movePiece board start end
+applyMoveBoard board (Move (Castling (Long White)) _ start end) = movePiece (movePiece board (7, 4) (7, 2)) (7, 0) (7, 3)
+applyMoveBoard board (Move (Castling (Short White)) _ start end) = movePiece (movePiece board (7, 4) (7, 6)) (7, 7) (7, 5)
+applyMoveBoard board (Move (Castling (Long Black)) _ start end) = movePiece (movePiece board (0, 4) (0, 2)) (0, 0) (0, 3)
+applyMoveBoard board (Move (Castling (Short Black)) _ start end) = movePiece (movePiece board (0, 4) (0, 6)) (0, 7) (0, 5)
+applyMoveBoard board (Move (EnPassant targetSquare) piece start end) = removePiece (movePiece board start end) targetSquare
+applyMoveBoard board (Move (Promotion promoted) piece start end) = addPiece (removePiece board start) end promoted
+applyMoveBoard board (Move PawnDoubleMove piece start end) = movePiece board start end
 
 
 getMovementMove :: GameState -> Coordinates -> Coordinates -> Maybe Move
