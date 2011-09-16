@@ -1,6 +1,7 @@
 module Piece (Piece(..), Color(..), Type(..), Castling(..),
               printPiece, printBigPiece, moveDirections, moveSquares, attackSquares, opponent, parsePiece,
-              getEnPassantTargetSquare, getCastling, getCastlingSquares, isPromotionSquare, pieceTypeString, isDoubleMove) where
+              getEnPassantTargetSquare, getCastling, getCastlingSquares, isPromotionSquare, pieceTypeString, isDoubleMove,
+              getInvalidatedCastlings, getCastlings) where
 
 import Data.Maybe
 import Data.Char
@@ -97,6 +98,17 @@ getCastling White (7, 4) (7, 7) = Just (Short White)
 getCastling Black (0, 4) (0, 0) = Just (Long Black)
 getCastling Black (0, 4) (0, 7) = Just (Short Black)
 getCastling _ _ _ = Nothing
+
+getCastlings :: Color -> [Castling]
+getCastlings color = [Long color, Short color]
+
+getInvalidatedCastlings :: Piece -> (Int, Int) -> [Castling]
+getInvalidatedCastlings (Piece King color) _ = [Long color, Short color]
+getInvalidatedCastlings (Piece Rook White) (7, 0) = [Long White]
+getInvalidatedCastlings (Piece Rook White) (7, 7) = [Short White]
+getInvalidatedCastlings (Piece Rook Black) (0, 0) = [Long Black]
+getInvalidatedCastlings (Piece Rook Black) (0, 7) = [Short Black]
+getInvalidatedCastlings _ _ = []
 
 getCastlingSquares :: Castling -> [(Int, Int)]
 getCastlingSquares (Long White) = [(7, y) | y <- [0..4]]

@@ -1,5 +1,6 @@
 module Move (GameState(..), Move(..), MoveType(..),
-             getMove, getAllLegalMoves, longAlgebraicNotation, debugPrintMoves) where
+             getMove, getAllLegalMoves, applyMoveBoard,
+             longAlgebraicNotation, debugPrintMoves) where
 
 import Data.Maybe
 import Data.List
