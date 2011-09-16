@@ -23,7 +23,7 @@ writeCastlings = sort . concat . map toString
 
 writeEnPassant :: Maybe Coordinates -> String
 writeEnPassant Nothing = "-"
-writeEnPassant (Just square) = coordinatesToString square
+writeEnPassant (Just square) = coordinatesToString $ fromEnPassantTargetSquare square
 
 writeFEN :: GameState -> String
 writeFEN state = unwords [writeBoard (board state), writePlayer (player state), writeCastlings (castlingsPossible state), writeEnPassant (enPassantSquare state), show (halfmoveClock state), show (moveNumber state)]
