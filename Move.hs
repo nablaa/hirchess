@@ -52,8 +52,11 @@ isPossibleMove state move@(Move _ _ start end) = generatedMove /= Nothing && fro
     where generatedMove = getMove state start end
 
 isLegalMove :: GameState -> Move -> Bool
-isLegalMove state@(State board player _ _ _ _) move = not (isCheck newBoard player) && isPossibleMove state move
+isLegalMove state@(State board player _ _ _ _) move = not (isCheck newBoard player) && isPossibleMove state move && moveGetPlayer move == player
     where newBoard = applyMoveBoard board move
+
+moveGetPlayer :: Move -> Color
+moveGetPlayer (Move _ (Piece _ color) _ _) = color
 
 applyMoveBoard :: Board -> Move -> Board
 applyMoveBoard board (Move Movement _ start end) = movePiece board start end
