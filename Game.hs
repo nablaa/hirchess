@@ -4,6 +4,7 @@ import Data.List
 import Board
 import Piece
 import Move
+import FEN
 
 initialState :: GameState
 initialState = State initialBoard White initialCastlings Nothing 0 1
