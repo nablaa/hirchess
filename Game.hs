@@ -1,4 +1,4 @@
-module Game (GameState, initialState) where
+module Game (GameState, initialState, applyMove, debugPrintState) where
 
 import Data.List
 import Board
