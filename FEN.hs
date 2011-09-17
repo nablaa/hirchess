@@ -8,7 +8,7 @@ import Board
 import Piece
 
 writeBoard :: Board -> String
-writeBoard = intercalate "/" . lines . concat . map emptyToNum . group . printBoard
+writeBoard = intercalate "/" . lines . concatMap emptyToNum . group . printBoard
     where emptyToNum str@(' ':_) = show $ length str
           emptyToNum str = str
 
@@ -17,7 +17,7 @@ writePlayer White = "w"
 writePlayer Black = "b"
 
 writeCastlings :: [Castling] -> String
-writeCastlings = sort . concat . map toString
+writeCastlings = sort . concatMap toString
     where toString (Long White) = "Q"
           toString (Short White) = "K"
           toString (Long Black) = "q"
@@ -32,7 +32,7 @@ writeFEN state = unwords [writeBoard (board state), writePlayer (player state), 
 
 readFEN :: String -> Maybe GameState
 readFEN str | length parts /= 6 = Nothing
-            | otherwise = do board <- readBoard $ parts !! 0
+            | otherwise = do board <- readBoard $ head parts
                              player <- readPlayer $ parts !! 1
                              castlings <- readCastlings $ parts !! 2
                              enPassant <- readEnPassant $ parts !! 3
@@ -46,7 +46,7 @@ readBoard str | length parts /= 8 = Nothing
               | otherwise = parseBoard $ unlines parts
     where numToEmpty x | isNumber x = replicate (digitToInt x) ' '
                        | otherwise = [x]
-          parts = split (== '/') $ concat $ map numToEmpty str
+          parts = split (== '/') $ concatMap numToEmpty str
 
 readPlayer :: String -> Maybe Color
 readPlayer "w" = Just White
@@ -54,7 +54,7 @@ readPlayer "b" = Just Black
 readPlayer _ = Nothing
 
 readCastlings :: String -> Maybe [Castling]
-readCastlings = sequence . map toCastling
+readCastlings = mapM toCastling
     where toCastling 'Q' = Just $ Long White
           toCastling 'K' = Just $ Short White
           toCastling 'q' = Just $ Long Black
