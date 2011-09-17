@@ -41,6 +41,7 @@ setHalfMoves :: GameState -> Move -> GameState
 setHalfMoves state (Move _ (Piece Pawn _) _ _) = state { halfmoveClock = 0 }
 setHalfMoves state _ = state { halfmoveClock = halfmoveClock state + 1 }
 
-
 debugPrintState :: GameState -> IO ()
-debugPrintState = undefined
+debugPrintState state = putStrLn $ printBigPrettyBoard (board state) ++ "\n\n"
+                        ++ "Current player: " ++ show (player state) ++ "\t\tMove number: " ++ show (moveNumber state) ++ "\n"
+                        ++ "FEN: " ++ writeFEN state
