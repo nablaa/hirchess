@@ -2,6 +2,7 @@ module UI () where
 
 import Game
 import Move
+import Colors
 
 main :: IO ()
 main = do _ <- debugPlayGame initialState
@@ -9,7 +10,7 @@ main = do _ <- debugPlayGame initialState
 
 debugPlayGame :: GameState -> IO (GameState)
 debugPlayGame state = do putStrLn $ printColoredState state
-                         putStrLn "\nEnter move: "
+                         putStrLn movePrompt
                          moveStr <- getLine
                          let coords = parseLongAlgebraicNotation moveStr
                          case coords of
@@ -17,7 +18,10 @@ debugPlayGame state = do putStrLn $ printColoredState state
                                                       Just move -> if isLegalMove state move then
                                                                       debugPlayGame $ applyMove state move
                                                                   else
-                                                                      putStrLn "Illegal move\n\n" >> debugPlayGame state
-                                                      Nothing -> putStrLn "Invalid move\n\n" >> debugPlayGame state
-                           Nothing -> putStrLn "Invalid coordinates\n\n" >> debugPlayGame state
-
+                                                                      putStrLn illegalMove >> debugPlayGame state
+                                                      Nothing -> putStrLn invalidMove >> debugPlayGame state
+                           Nothing -> putStrLn invalidCoordinates >> debugPlayGame state
+    where movePrompt = withColor magenta "\nEnter move: "
+          illegalMove = withColor red "Illegal move\n\n"
+          invalidMove = withColor red "Invalid move\n\n"
+          invalidCoordinates = withColor red "Invalid coordinates\n\n"
