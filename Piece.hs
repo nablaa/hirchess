@@ -1,11 +1,14 @@
 module Piece (Piece(..), Color(..), Type(..), Castling(..),
-              printPiece, printBigPiece, moveDirections, moveSquares, attackSquares, opponent, parsePiece,
-              getEnPassantTargetSquare, getCastling, getCastlingSquares, isPromotionSquare, pieceTypeString, isDoubleMove,
-              getInvalidatedCastlings, getCastlings, fromEnPassantTargetSquare, toEnPassantTargetSquare) where
+              printPiece, printBigPiece, printBigPieceColored, moveDirections, moveSquares,
+              attackSquares, opponent, parsePiece, getEnPassantTargetSquare, getCastling,
+              getCastlingSquares, isPromotionSquare, pieceTypeString, isDoubleMove,
+              getInvalidatedCastlings, getCastlings, fromEnPassantTargetSquare,
+              toEnPassantTargetSquare) where
 
 import Data.Maybe
 import Data.Char
 import Data.List
+import Colors
 
 data Piece = Piece Type Color
              deriving (Eq, Show, Read)
@@ -26,6 +29,10 @@ opponent :: Color -> Color
 opponent White = Black
 opponent Black = White
 
+ansiColor :: Color -> ANSIColor
+ansiColor White = red
+ansiColor Black = blue
+
 pieceTypeString :: Type -> String
 pieceTypeString Pawn = ""
 pieceTypeString t = [fromJust $ lookup t pieceChars]
@@ -40,6 +47,9 @@ printBigPiece :: Piece -> String
 printBigPiece p@(Piece _ color) = case color of
                                   White -> toUpper (printPiece p) : "W"
                                   Black -> toUpper (printPiece p) : "B"
+
+printBigPieceColored :: Piece -> String
+printBigPieceColored p@(Piece _ color) = withColor (ansiColor color) $ printBigPiece p
 
 parsePiece :: Char -> Maybe Piece
 parsePiece c = do
