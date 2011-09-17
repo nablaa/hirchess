@@ -3,7 +3,7 @@ module Piece (Piece(..), Color(..), Type(..), Castling(..),
               attackSquares, opponent, parsePiece, getEnPassantTargetSquare, getCastling,
               getCastlingSquares, isPromotionSquare, pieceTypeString, isDoubleMove,
               getInvalidatedCastlings, getCastlings, fromEnPassantTargetSquare,
-              toEnPassantTargetSquare) where
+              toEnPassantTargetSquare, ansiColor) where
 
 import Data.Maybe
 import Data.Char

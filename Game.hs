@@ -1,10 +1,11 @@
-module Game (GameState, initialState, applyMove, debugPrintState) where
+module Game (GameState, initialState, applyMove, printColoredState, debugPrintState) where
 
 import Data.List
 import Board
 import Piece
 import Move
 import FEN
+import Colors
 
 initialState :: GameState
 initialState = State initialBoard White initialCastlings Nothing 0 1
@@ -40,6 +41,13 @@ incrMoves state | player state == White = state { moveNumber = moveNumber state 
 setHalfMoves :: GameState -> Move -> GameState
 setHalfMoves state (Move _ (Piece Pawn _) _ _) = state { halfmoveClock = 0 }
 setHalfMoves state _ = state { halfmoveClock = halfmoveClock state + 1 }
+
+printColoredState :: GameState -> String
+printColoredState state = printBigPrettyColoredBoard (board state) ++ "\n\n"
+                          ++ "Current player: " ++ withColor (ansiColor color) (show color)
+                          ++ "\t\tMove number: " ++ show (moveNumber state) ++ "\n"
+                          ++ "FEN: " ++ writeFEN state
+    where color = player state
 
 debugPrintState :: GameState -> IO ()
 debugPrintState state = putStrLn $ printBigPrettyBoard (board state) ++ "\n\n"

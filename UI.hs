@@ -8,7 +8,7 @@ main = do _ <- debugPlayGame initialState
           putStrLn ""
 
 debugPlayGame :: GameState -> IO (GameState)
-debugPlayGame state = do debugPrintState state
+debugPlayGame state = do putStrLn $ printColoredState state
                          putStrLn "\nEnter move: "
                          moveStr <- getLine
                          let coords = parseLongAlgebraicNotation moveStr
