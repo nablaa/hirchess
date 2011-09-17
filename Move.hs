@@ -1,6 +1,6 @@
 module Move (GameState(..), Move(..), MoveType(..),
              getMove, getAllLegalMoves, applyMoveBoard,
-             longAlgebraicNotation, debugPrintMoves) where
+             longAlgebraicNotation, parseLongAlgebraicNotation, debugPrintMoves) where
 
 import Data.Maybe
 import Data.List
@@ -132,6 +132,14 @@ longAlgebraicNotation (Move (Castling (Short _)) _ _ _) = "O-O"
 longAlgebraicNotation move@(Move (EnPassant _) _ _ _) = longAlgebraicNotation' move "x"
 longAlgebraicNotation move@(Move (Promotion (Piece promoted _)) _ _ _) = longAlgebraicNotation' move "-" ++ pieceTypeString promoted
 longAlgebraicNotation move@(Move PawnDoubleMove _ _ _) = longAlgebraicNotation' move "-"
+
+parseLongAlgebraicNotation :: String -> Maybe (Coordinates, Coordinates)
+parseLongAlgebraicNotation (c1:r1:'-':c2:r2:[]) = do coord1 <- coord1'
+                                                     coord2 <- coord2'
+                                                     Just (coord1, coord2)
+    where coord1' = stringToCoordinates (c1:r1:[])
+          coord2' = stringToCoordinates (c2:r2:[])
+parseLongAlgebraicNotation _ = Nothing
 
 debugPrintMoves :: [Move] -> IO ()
 debugPrintMoves = mapM_ (putStrLn . longAlgebraicNotation)
