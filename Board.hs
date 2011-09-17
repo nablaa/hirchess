@@ -1,7 +1,8 @@
 module Board (Board, Coordinates, initialBoard, emptyBoard,
               printBoard, parseBoard, printPrettyBoard, printBigPrettyBoard, printSquares,
               canMove, canCapture, getPiece, getPlayer, isColor, getReachable, addPiece, removePiece, movePiece,
-              addPieces, isChecked, isCheck, isEmpty, debugPrintBoard, coordinatesToString, allCoordinates) where
+              addPieces, isChecked, isCheck, isEmpty, debugPrintBoard, coordinatesToString, stringToCoordinates,
+              allCoordinates) where
 
 import Data.Char
 import Data.Maybe
@@ -161,3 +162,9 @@ boardFromPieces pieces = listArray ((0, 0), (7, 7)) $ map f pieces
 
 coordinatesToString :: Coordinates -> String
 coordinatesToString (r, c) = [chr (ord 'a' + c), intToDigit (8 - r)]
+
+stringToCoordinates :: String -> Maybe Coordinates
+stringToCoordinates (c:r:[]) | isInsideBoard coordinates = Just coordinates
+                             | otherwise = Nothing
+    where coordinates = (ord '8' - ord r, ord c - ord 'a')
+stringToCoordinates _ = Nothing

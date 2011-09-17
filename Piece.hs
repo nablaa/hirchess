@@ -1,7 +1,7 @@
 module Piece (Piece(..), Color(..), Type(..), Castling(..),
               printPiece, printBigPiece, moveDirections, moveSquares, attackSquares, opponent, parsePiece,
               getEnPassantTargetSquare, getCastling, getCastlingSquares, isPromotionSquare, pieceTypeString, isDoubleMove,
-              getInvalidatedCastlings, getCastlings, fromEnPassantTargetSquare) where
+              getInvalidatedCastlings, getCastlings, fromEnPassantTargetSquare, toEnPassantTargetSquare) where
 
 import Data.Maybe
 import Data.Char
@@ -95,6 +95,10 @@ getEnPassantTargetSquare (x, y) Black = (x + 1, y)
 fromEnPassantTargetSquare :: (Int, Int) -> (Int, Int)
 fromEnPassantTargetSquare (x, y) | x <= 3 = (x - 1, y)
                                  | otherwise = (x + 1, y)
+
+toEnPassantTargetSquare :: (Int, Int) -> (Int, Int)
+toEnPassantTargetSquare (x, y) | x <= 3 = (x + 1, y)
+                               | otherwise = (x - 1, y)
 
 getCastling :: Color -> (Int, Int) -> (Int, Int) -> Maybe Castling
 getCastling White (7, 4) (7, 0) = Just (Long White)
