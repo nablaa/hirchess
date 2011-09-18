@@ -38,7 +38,7 @@ defaultBG ="\x1b[49m"
 
 boardColor = yellow
 coordinateColor = cyan
-whitePlayerColor = red
+whitePlayerColor = white
 blackPlayerColor = blue
 promptColor = magenta
 errorColor = red
