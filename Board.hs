@@ -3,7 +3,7 @@ module Board (Board, Coordinates, initialBoard, parseBoardCompact, printBoardCom
               canMove, canCapture, getPiece, getPlayer, addPiece, removePiece,
               movePiece, isChecked, isCheck, isEmpty, coordinatesToString,
               stringToCoordinates, allCoordinates, isPromotionSquare,
-              isDoubleMove) where
+              isDoubleMove, fromEnPassantTargetSquare, toEnPassantTargetSquare) where
 
 import Data.Char
 import Data.Maybe
@@ -112,6 +112,16 @@ isCheck board player = isChecked board player kingSquare
     where kingSquare = fromJust $ rlookup (Square (Piece King player)) $ assocs board
           rlookup x = lookup x . map swap
           swap (x, y) = (y, x)
+
+enPassantConversion :: Int -> Coordinates -> Coordinates
+enPassantConversion n (x, y) | x <= 3 = (x + n, y)
+                             | otherwise = (x - n, y)
+
+fromEnPassantTargetSquare :: Coordinates -> Coordinates
+fromEnPassantTargetSquare = enPassantConversion (-1)
+
+toEnPassantTargetSquare :: Coordinates -> Coordinates
+toEnPassantTargetSquare = enPassantConversion 1
 
 isPromotionSquare :: Coordinates -> Color -> Bool
 isPromotionSquare (0, _) White = True

@@ -1,8 +1,6 @@
-module Piece (Piece(..), Color(..), Type(..), Castling(..),
-              printPiece, printBigPiece, printBigPieceColored, moveDirections, moveSquares,
-              attackSquares, opponent, parsePiece, getCastling, getCastlings,
-              getCastlingSquares, pieceTypeString, fromEnPassantTargetSquare,
-              toEnPassantTargetSquare) where
+module Piece (Piece(..), Color(..), Type(..),
+              printPiece, printBigPiece, printBigPieceColored, parsePiece,
+              moveDirections, moveSquares, attackSquares, opponent) where
 
 import Data.Maybe
 import Data.Char
@@ -18,19 +16,12 @@ data Color = White | Black
 data Type = Pawn | Knight | Bishop | Rook | Queen | King
             deriving (Eq, Show, Read)
 
-data Castling = Long Color | Short Color
-                deriving (Eq, Show, Read)
-
 pieceChars :: [(Type, Char)]
 pieceChars = [(Pawn, 'P'), (Knight, 'N'), (Bishop, 'B'), (Rook, 'R'), (Queen, 'Q'), (King, 'K')]
 
 opponent :: Color -> Color
 opponent White = Black
 opponent Black = White
-
-pieceTypeString :: Type -> String
-pieceTypeString Pawn = ""
-pieceTypeString t = [fromJust $ lookup t pieceChars]
 
 printPiece :: Piece -> Char
 printPiece (Piece t color) = case color of
@@ -95,28 +86,3 @@ moveSquares square piece = fromDiff moveSquaresDiff square piece
 attackSquares :: (Int, Int) -> Piece -> [(Int, Int)]
 attackSquares = fromDiff attackSquaresDiff
 
-enPassantConversion :: Int -> (Int, Int) -> (Int, Int)
-enPassantConversion n (x, y) | x <= 3 = (x + n, y)
-                             | otherwise = (x - n, y)
-
-fromEnPassantTargetSquare :: (Int, Int) -> (Int, Int)
-fromEnPassantTargetSquare = enPassantConversion (-1)
-
-toEnPassantTargetSquare :: (Int, Int) -> (Int, Int)
-toEnPassantTargetSquare = enPassantConversion 1
-
-getCastling :: Color -> (Int, Int) -> (Int, Int) -> Maybe Castling
-getCastling White (7, 4) (7, 0) = Just (Long White)
-getCastling White (7, 4) (7, 7) = Just (Short White)
-getCastling Black (0, 4) (0, 0) = Just (Long Black)
-getCastling Black (0, 4) (0, 7) = Just (Short Black)
-getCastling _ _ _ = Nothing
-
-getCastlings :: Color -> [Castling]
-getCastlings color = [Long color, Short color]
-
-getCastlingSquares :: Castling -> [(Int, Int)]
-getCastlingSquares (Long White) = [(7, y) | y <- [0..4]]
-getCastlingSquares (Short White) = [(7, y) | y <- [4..7]]
-getCastlingSquares (Long Black) = [(0, y) | y <- [0..4]]
-getCastlingSquares (Short Black) = [(0, y) | y <- [4..7]]

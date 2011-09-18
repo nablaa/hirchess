@@ -1,4 +1,4 @@
-module Move (GameState(..), Move(..), MoveType(..),
+module Move (GameState(..), Move(..), MoveType(..), Castling(..),
              getMove, isLegalMove, getAllLegalMoves, applyMoveBoard,
              longAlgebraicNotation, parseLongAlgebraicNotation, debugPrintMoves) where
 
@@ -11,6 +11,9 @@ data Move = Move MoveType Piece Coordinates Coordinates
             deriving (Eq, Show, Read)
 
 data MoveType = Movement | Capture | Castling Castling | EnPassant Coordinates | Promotion Piece | PawnDoubleMove
+                deriving (Eq, Show, Read)
+
+data Castling = Long Color | Short Color
                 deriving (Eq, Show, Read)
 
 data GameState = State {
@@ -116,9 +119,22 @@ getEnPassantMove (State board player _ (Just square) _ _) start end
 getEnPassantMove (State board player _ _ _ _) start end = Just $ Move (EnPassant end) piece start end
     where (Just piece) = getPiece board start
 
+getCastling :: Color -> Coordinates -> Coordinates -> Maybe Castling
+getCastling White (7, 4) (7, 0) = Just (Long White)
+getCastling White (7, 4) (7, 7) = Just (Short White)
+getCastling Black (0, 4) (0, 0) = Just (Long Black)
+getCastling Black (0, 4) (0, 7) = Just (Short Black)
+getCastling _ _ _ = Nothing
+
+getCastlingSquares :: Castling -> [Coordinates]
+getCastlingSquares (Long White) = [(7, y) | y <- [0..4]]
+getCastlingSquares (Short White) = [(7, y) | y <- [4..7]]
+getCastlingSquares (Long Black) = [(0, y) | y <- [0..4]]
+getCastlingSquares (Short Black) = [(0, y) | y <- [4..7]]
+
 longAlgebraicNotation' :: Move -> String -> String
 longAlgebraicNotation' (Move _ (Piece pieceType _) start end) separator = pieceStr ++ startStr ++ separator ++ endStr
-    where pieceStr = pieceTypeString pieceType
+    where pieceStr = [printPiece (Piece pieceType White)]
           startStr = coordinatesToString start
           endStr = coordinatesToString end
 
@@ -128,7 +144,7 @@ longAlgebraicNotation move@(Move Capture _ _ _) = longAlgebraicNotation' move "x
 longAlgebraicNotation (Move (Castling (Long _)) _ _ _) = "O-O-O"
 longAlgebraicNotation (Move (Castling (Short _)) _ _ _) = "O-O"
 longAlgebraicNotation move@(Move (EnPassant _) _ _ _) = longAlgebraicNotation' move "x"
-longAlgebraicNotation move@(Move (Promotion (Piece promoted _)) _ _ _) = longAlgebraicNotation' move "-" ++ pieceTypeString promoted
+longAlgebraicNotation move@(Move (Promotion (Piece promoted _)) _ _ _) = longAlgebraicNotation' move "-" ++ [printPiece (Piece promoted White)]
 longAlgebraicNotation move@(Move PawnDoubleMove _ _ _) = longAlgebraicNotation' move "-"
 
 parseLongAlgebraicNotation :: String -> Maybe (Coordinates, Coordinates)

@@ -42,6 +42,9 @@ getInvalidatedCastlings (Piece Rook Black) (0, 0) = [Long Black]
 getInvalidatedCastlings (Piece Rook Black) (0, 7) = [Short Black]
 getInvalidatedCastlings _ _ = []
 
+getCastlings :: Color -> [Castling]
+getCastlings color = [Long color, Short color]
+
 incrMoves :: GameState -> GameState
 incrMoves state | player state == White = state { moveNumber = moveNumber state + 1 }
                 | otherwise = state
