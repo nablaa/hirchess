@@ -108,7 +108,7 @@ getEnPassantMove (State _ _ _ Nothing _ _) _ _ = Nothing
 getEnPassantMove (State board player _ (Just square) _ _) start end
     | startPiece /= Just (Piece Pawn player) = Nothing
     | endPiece /= Nothing = Nothing
-    | end `notElem` attackSquares start piece = Nothing
+    | end `notElem` captureSquares board piece start = Nothing
     | end /= square = Nothing
     | targetPiece /= Just (Piece Pawn (opponent player)) = Nothing
     where startPiece = getPiece board start

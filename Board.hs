@@ -2,7 +2,7 @@ module Board (Board, Coordinates, initialBoard, parseBoardCompact, printBoardCom
               printPrettyBoard, printBigPrettyBoard, printBigPrettyColoredBoard,
               canMove, canCapture, getPiece, getPlayer, addPiece, removePiece,
               movePiece, isChecked, isCheck, isEmpty, coordinatesToString,
-              stringToCoordinates, allCoordinates, isPromotionSquare,
+              stringToCoordinates, allCoordinates, isPromotionSquare, captureSquares,
               isDoubleMove, fromEnPassantTargetSquare, toEnPassantTargetSquare) where
 
 import Data.Char
@@ -68,35 +68,45 @@ addPieces :: Board -> [(Coordinates, Piece)] -> Board
 addPieces board list = foldr f board list
     where f (coordinates, piece) b = addPiece b coordinates piece
 
+sumCoordinates :: Coordinates -> Coordinates -> Coordinates
+sumCoordinates (x1, y1) (x2, y2) = (x1 + x2, y1 + y2)
+
 iterateDirection' :: Board -> Color -> Coordinates -> Coordinates -> [Coordinates] -> [Coordinates]
-iterateDirection' board color square@(x, y) direction@(dx ,dy) squares
+iterateDirection' board color square direction squares
     | not $ isInsideBoard square = squares
-    | isEmpty board square = iterateDirection' board color (x + dx, y + dy) direction (square : squares)
+    | isEmpty board square = iterateDirection' board color (sumCoordinates square direction) direction (square : squares)
     | otherwise = if isPlayer board square color then
                       squares
                   else
                       square : squares
 
 iterateDirection :: Board -> Color -> Coordinates -> Coordinates -> [Coordinates]
-iterateDirection board color (x, y) direction@(dx, dy) = iterateDirection' board color (x + dx, y + dy) direction []
+iterateDirection board color square direction = iterateDirection' board color (sumCoordinates square direction) direction []
 
-getReachable :: Board -> Piece -> Coordinates -> [Coordinates]
-getReachable board piece@(Piece Pawn _) square = moveSquares square piece
-getReachable board piece@(Piece Knight _) square = moveSquares square piece
-getReachable board piece@(Piece King _) square = moveSquares square piece
-getReachable board piece@(Piece _ color) square = nub $ sort $ concatMap (iterateDirection board color square) (moveDirections piece)
+moveSquares :: Board -> Piece -> Coordinates -> [Coordinates]
+moveSquares _ piece@(Piece Pawn White) (6, y) = [(5, y), (4, y)]
+moveSquares _ piece@(Piece Pawn Black) (1, y) = [(2, y), (3, y)]
+moveSquares _ piece@(Piece Pawn _) square = filter isInsideBoard $ map (sumCoordinates square) (movePattern piece)
+moveSquares _ piece@(Piece Knight _) square = filter isInsideBoard $ map (sumCoordinates square) (movePattern piece)
+moveSquares _ piece@(Piece King _) square = filter isInsideBoard $ map (sumCoordinates square) (movePattern piece)
+moveSquares board piece@(Piece _ color) square = nub $ sort $ concatMap (iterateDirection board color square) (movePattern piece)
+
+captureSquares :: Board -> Piece -> Coordinates -> [Coordinates]
+captureSquares _ piece@(Piece Pawn _) square = filter isInsideBoard $ map (sumCoordinates square) (capturePattern piece)
+captureSquares _ piece@(Piece Knight _) square = filter isInsideBoard $ map (sumCoordinates square) (capturePattern piece)
+captureSquares _ piece@(Piece King _) square = filter isInsideBoard $ map (sumCoordinates square) (capturePattern piece)
+captureSquares board piece@(Piece _ color) square = nub $ sort $ concatMap (iterateDirection board color square) (movePattern piece)
 
 canMove :: Board -> Piece -> Coordinates -> Coordinates -> Bool
 canMove board piece start end = isInsideBoard start && isInsideBoard end
-                                && isEmpty board end && end `elem` getReachable board piece start
+                                && isEmpty board end && end `elem` moveSquares board piece start
 
 canCapture :: Board -> Piece -> Coordinates -> Coordinates -> Bool
-canCapture board (Piece _ color) start end = isPlayer board end (opponent color) && threatens board end start
+canCapture board piece@(Piece _ color) start end = isInsideBoard start && isInsideBoard end
+                                                   && isPlayer board end (opponent color) && end `elem` captureSquares board piece start
 
 threatens :: Board -> Coordinates -> Coordinates -> Bool
-threatens board end start = case piece of
-                              Piece Pawn color -> isInsideBoard start && isInsideBoard end && end `elem` attackSquares start piece
-                              _ -> isInsideBoard start && isInsideBoard end && end `elem` getReachable board piece start
+threatens board end start = canCapture board piece start end
     where (Just piece) = getPiece board start
 
 isChecked :: Board -> Color -> Coordinates -> Bool
