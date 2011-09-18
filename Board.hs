@@ -148,13 +148,13 @@ printBigPrettyColoredBoard = addCoordinatesColored . printRowsColored . intoRows
           intoRows xs = take 8 xs : intoRows (drop 8 xs)
 
 addCoordinatesColored :: String -> String
-addCoordinatesColored str = unlines (init (zipWith (++) numbers (lines str))) ++ cColor "     a    b    c    d    e    f    g    h\n"
+addCoordinatesColored str = unlines (init (zipWith (++) numbers (lines str))) ++ cColor "    a   b   c   d   e   f   g   h\n"
     where cColor = withColor coordinateColor
-          numbers = (map cColor . concat . transpose) [repeat "   ", reverse [intToDigit n : "  " | n <- [1..8]]]
+          numbers = (map cColor . concat . transpose) [repeat "  ", reverse [intToDigit n : " " | n <- [1..8]]]
 
 printSquareColored :: Square -> String
-printSquareColored Empty = "    "
-printSquareColored (Square p) = " " ++ printBigPieceColored p ++ " "
+printSquareColored Empty = "   "
+printSquareColored (Square p) = " " ++ printBigPieceColored p ++ ""
 
 printRowColored :: [Square] -> String
 printRowColored row = sep ++ intercalate sep (map printSquareColored row) ++ sep ++ "\n"
@@ -164,7 +164,7 @@ printRowColored row = sep ++ intercalate sep (map printSquareColored row) ++ sep
 printRowsColored :: [[Square]] -> String
 printRowsColored rows = line ++ intercalate line (map printRowColored rows) ++ line
     where bColor = withColor boardColor
-          line = bColor $ concat (replicate 8 "+----") ++ "+\n"
+          line = bColor $ concat (replicate 8 "+---") ++ "+\n"
 
 printSquares :: (Board -> String) -> [Coordinates] -> String
 printSquares f squares = f $ emptyBoard // [(s, Square (Piece Pawn White)) | s <- squares]

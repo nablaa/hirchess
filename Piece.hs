@@ -49,7 +49,7 @@ printBigPiece p@(Piece _ color) = case color of
                                   Black -> toUpper (printPiece p) : "B"
 
 printBigPieceColored :: Piece -> String
-printBigPieceColored p@(Piece _ color) = withColor (ansiColor color) $ printBigPiece p
+printBigPieceColored p@(Piece _ color) = withColor (ansiColor color) [printPiece p, ' ']
 
 parsePiece :: Char -> Maybe Piece
 parsePiece c = do
