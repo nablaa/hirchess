@@ -18,10 +18,6 @@ data Square = Square Piece | Empty
 type Coordinates = (Int, Int)
 type Board = Array Coordinates Square
 
-
-boardColor = yellow
-coordinateColor = cyan
-
 initialBoard :: Board
 initialBoard = listArray ((0, 0), (7, 7)) rows
     where officerRow p = map (\x -> Square (Piece x p)) [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]

@@ -34,5 +34,12 @@ cyanBG ="\x1b[46m"
 whiteBG ="\x1b[47m"
 defaultBG ="\x1b[49m"
 
+
+boardColor = yellow
+coordinateColor = cyan
+whitePlayerColor = red
+blackPlayerColor = blue
+
+
 withColor :: ANSIColor -> String -> String
 withColor color str = color ++ str ++ reset
