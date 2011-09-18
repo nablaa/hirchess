@@ -21,7 +21,7 @@ debugPlayGame state = do putStrLn $ printColoredState state
                                                                       putStrLn illegalMove >> debugPlayGame state
                                                       Nothing -> putStrLn invalidMove >> debugPlayGame state
                            Nothing -> putStrLn invalidCoordinates >> debugPlayGame state
-    where movePrompt = withColor magenta "\nEnter move: "
-          illegalMove = withColor red "Illegal move\n\n"
-          invalidMove = withColor red "Invalid move\n\n"
-          invalidCoordinates = withColor red "Invalid coordinates\n\n"
+    where movePrompt = withColor promptColor "\nEnter move: "
+          illegalMove = withColor errorColor "Illegal move\n\n"
+          invalidMove = withColor errorColor "Invalid move\n\n"
+          invalidCoordinates = withColor errorColor "Invalid coordinates\n\n"

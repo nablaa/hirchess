@@ -1,4 +1,5 @@
-module Colors where
+module Colors (withColor, boardColor, coordinateColor,
+               whitePlayerColor, blackPlayerColor, promptColor, errorColor) where
 
 type ANSIColor = String
 
@@ -39,6 +40,8 @@ boardColor = yellow
 coordinateColor = cyan
 whitePlayerColor = red
 blackPlayerColor = blue
+promptColor = magenta
+errorColor = red
 
 
 withColor :: ANSIColor -> String -> String

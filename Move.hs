@@ -139,5 +139,5 @@ parseLongAlgebraicNotation (c1:r1:'-':c2:r2:[]) = do coord1 <- coord1'
           coord2' = stringToCoordinates [c2, r2]
 parseLongAlgebraicNotation _ = Nothing
 
-debugPrintMoves :: [Move] -> IO ()
-debugPrintMoves = mapM_ (putStrLn . longAlgebraicNotation)
+debugPrintMoves :: [Move] -> String
+debugPrintMoves = unlines . map longAlgebraicNotation

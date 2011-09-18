@@ -1,4 +1,4 @@
-module Game (GameState, initialState, applyMove, printColoredState, debugPrintState) where
+module Game (GameState, initialState, applyMove, printColoredState) where
 
 import Data.List
 import Board
@@ -34,7 +34,7 @@ applyMove (State board player castlings enpassant halfmove moves) move@(Move (Pr
 applyMove (State board player castlings enpassant halfmove moves) move@(Move (PawnDoubleMove) _ _ end)
     = setHalfMoves (incrMoves (State (applyMoveBoard board move) (opponent player) castlings (Just $ fromEnPassantTargetSquare end) halfmove moves)) move
 
-getInvalidatedCastlings :: Piece -> (Int, Int) -> [Castling]
+getInvalidatedCastlings :: Piece -> Coordinates -> [Castling]
 getInvalidatedCastlings (Piece King color) _ = [Long color, Short color]
 getInvalidatedCastlings (Piece Rook White) (7, 0) = [Long White]
 getInvalidatedCastlings (Piece Rook White) (7, 7) = [Short White]
@@ -58,8 +58,3 @@ printColoredState state = printBigPrettyColoredBoard (board state) ++ "\n\n"
     where color = player state
           playerColor White = whitePlayerColor
           playerColor Black = blackPlayerColor
-
-debugPrintState :: GameState -> IO ()
-debugPrintState state = putStrLn $ printBigPrettyBoard (board state) ++ "\n\n"
-                        ++ "Current player: " ++ show (player state) ++ "\t\tMove number: " ++ show (moveNumber state) ++ "\n"
-                        ++ "FEN: " ++ writeFEN state
