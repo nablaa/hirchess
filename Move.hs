@@ -127,10 +127,10 @@ getCastling Black (0, 4) (0, 7) = Just (Short Black)
 getCastling _ _ _ = Nothing
 
 getCastlingSquares :: Castling -> [Coordinates]
-getCastlingSquares (Long White) = [(7, y) | y <- [0..4]]
-getCastlingSquares (Short White) = [(7, y) | y <- [4..7]]
-getCastlingSquares (Long Black) = [(0, y) | y <- [0..4]]
-getCastlingSquares (Short Black) = [(0, y) | y <- [4..7]]
+getCastlingSquares (Long White) = [(7, c) | c <- [0..4]]
+getCastlingSquares (Short White) = [(7, c) | c <- [4..7]]
+getCastlingSquares (Long Black) = [(0, c) | c <- [0..4]]
+getCastlingSquares (Short Black) = [(0, c) | c <- [4..7]]
 
 longAlgebraicNotation' :: Move -> String -> String
 longAlgebraicNotation' (Move _ (Piece pieceType _) start end) separator = pieceStr ++ startStr ++ separator ++ endStr

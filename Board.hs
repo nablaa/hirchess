@@ -20,8 +20,8 @@ type Board = Array Coordinates Square
 
 initialBoard :: Board
 initialBoard = listArray ((0, 0), (7, 7)) rows
-    where officerRow p = map (\x -> Square (Piece x p)) [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
-          pawnRow p = map (\x -> Square (Piece x p)) $ replicate 8 Pawn
+    where officerRow p = map (\t -> Square (Piece t p)) [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
+          pawnRow p = map (\t -> Square (Piece t p)) $ replicate 8 Pawn
           rows = officerRow Black ++ pawnRow Black ++ replicate 32 Empty ++ pawnRow White ++ officerRow White
 
 emptyBoard :: Board
@@ -69,7 +69,7 @@ addPieces board list = foldr f board list
     where f (coordinates, piece) b = addPiece b coordinates piece
 
 sumCoordinates :: Coordinates -> Coordinates -> Coordinates
-sumCoordinates (x1, y1) (x2, y2) = (x1 + x2, y1 + y2)
+sumCoordinates (r1, c1) (r2, c2) = (r1 + r2, c1 + c2)
 
 iterateDirection' :: Board -> Color -> Coordinates -> Coordinates -> [Coordinates] -> [Coordinates]
 iterateDirection' board color square direction squares
@@ -84,8 +84,8 @@ iterateDirection :: Board -> Color -> Coordinates -> Coordinates -> [Coordinates
 iterateDirection board color square direction = iterateDirection' board color (sumCoordinates square direction) direction []
 
 moveSquares :: Board -> Piece -> Coordinates -> [Coordinates]
-moveSquares _ piece@(Piece Pawn White) (6, y) = [(5, y), (4, y)]
-moveSquares _ piece@(Piece Pawn Black) (1, y) = [(2, y), (3, y)]
+moveSquares _ piece@(Piece Pawn White) (6, c) = [(5, c), (4, c)]
+moveSquares _ piece@(Piece Pawn Black) (1, c) = [(2, c), (3, c)]
 moveSquares _ piece@(Piece Pawn _) square = filter isInsideBoard $ map (sumCoordinates square) (movePattern piece)
 moveSquares _ piece@(Piece Knight _) square = filter isInsideBoard $ map (sumCoordinates square) (movePattern piece)
 moveSquares _ piece@(Piece King _) square = filter isInsideBoard $ map (sumCoordinates square) (movePattern piece)
@@ -124,8 +124,8 @@ isCheck board player = isChecked board player kingSquare
           swap (x, y) = (y, x)
 
 enPassantConversion :: Int -> Coordinates -> Coordinates
-enPassantConversion n (x, y) | x <= 3 = (x + n, y)
-                             | otherwise = (x - n, y)
+enPassantConversion n (r, c) | r <= 3 = (r + n, c)
+                             | otherwise = (r - n, c)
 
 fromEnPassantTargetSquare :: Coordinates -> Coordinates
 fromEnPassantTargetSquare = enPassantConversion (-1)
@@ -142,6 +142,20 @@ isDoubleMove :: Coordinates -> Coordinates -> Color -> Bool
 isDoubleMove (6, _) (4, _) White = True
 isDoubleMove (1, _) (3, _) Black = True
 isDoubleMove _ _ _ = False
+
+boardFromPieces :: [Maybe Piece] -> Board
+boardFromPieces pieces = listArray ((0, 0), (7, 7)) $ map f pieces
+    where f (Just piece) = Square piece
+          f Nothing = Empty
+
+coordinatesToString :: Coordinates -> String
+coordinatesToString (r, c) = [chr (ord 'a' + c), intToDigit (8 - r)]
+
+stringToCoordinates :: String -> Maybe Coordinates
+stringToCoordinates (c:r:[]) | isInsideBoard coordinates = Just coordinates
+                             | otherwise = Nothing
+    where coordinates = (ord '8' - ord r, ord c - ord 'a')
+stringToCoordinates _ = Nothing
 
 squareToChar :: Square -> Char
 squareToChar Empty = ' '
@@ -205,17 +219,3 @@ parseBoardCompact :: String -> Maybe Board
 parseBoardCompact str | length pieces == 64 = Just $ boardFromPieces pieces
                       | otherwise = Nothing
     where pieces = parseBoard' str
-
-boardFromPieces :: [Maybe Piece] -> Board
-boardFromPieces pieces = listArray ((0, 0), (7, 7)) $ map f pieces
-    where f (Just piece) = Square piece
-          f Nothing = Empty
-
-coordinatesToString :: Coordinates -> String
-coordinatesToString (r, c) = [chr (ord 'a' + c), intToDigit (8 - r)]
-
-stringToCoordinates :: String -> Maybe Coordinates
-stringToCoordinates (c:r:[]) | isInsideBoard coordinates = Just coordinates
-                             | otherwise = Nothing
-    where coordinates = (ord '8' - ord r, ord c - ord 'a')
-stringToCoordinates _ = Nothing

@@ -23,6 +23,26 @@ opponent :: Color -> Color
 opponent White = Black
 opponent Black = White
 
+diagonal :: [(Int, Int)]
+diagonal = [(-1, -1), (-1, 1), (1, 1), (1, -1)]
+
+perpendicular :: [(Int, Int)]
+perpendicular = [(-1, 0), (0, 1), (1, 0), (0, -1)]
+
+movePattern :: Piece -> [(Int, Int)]
+movePattern (Piece Pawn White) = [(-1, 0)]
+movePattern (Piece Pawn Black) = [(1, 0)]
+movePattern (Piece Knight _) = [(-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1)]
+movePattern (Piece Bishop _) = diagonal
+movePattern (Piece Rook _) = perpendicular
+movePattern (Piece Queen _) = perpendicular ++ diagonal
+movePattern (Piece King _) = perpendicular ++ diagonal
+
+capturePattern :: Piece -> [(Int, Int)]
+capturePattern (Piece Pawn White) = [(-1, -1), (-1, 1)]
+capturePattern (Piece Pawn Black) = [(1, -1), (1, 1)]
+capturePattern piece = movePattern piece
+
 printPiece :: Piece -> Char
 printPiece (Piece t color) = case color of
                                White -> toUpper c
@@ -45,24 +65,3 @@ parsePiece c = do
   if isUpper c then return (Piece pieceType White) else return (Piece pieceType Black)
     where rlookup x = lookup x . map swap
           swap (x, y) = (y, x)
-
-diagonal :: [(Int, Int)]
-diagonal = [(-1, -1), (-1, 1), (1, 1), (1, -1)]
-
-perpendicular :: [(Int, Int)]
-perpendicular = [(-1, 0), (0, 1), (1, 0), (0, -1)]
-
-movePattern :: Piece -> [(Int, Int)]
-movePattern (Piece Pawn White) = [(-1, 0)]
-movePattern (Piece Pawn Black) = [(1, 0)]
-movePattern (Piece Knight _) = [(-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1)]
-movePattern (Piece Bishop _) = diagonal
-movePattern (Piece Rook _) = perpendicular
-movePattern (Piece Queen _) = perpendicular ++ diagonal
-movePattern (Piece King _) = perpendicular ++ diagonal
-
-capturePattern :: Piece -> [(Int, Int)]
-capturePattern (Piece Pawn White) = [(-1, -1), (-1, 1)]
-capturePattern (Piece Pawn Black) = [(1, -1), (1, 1)]
-capturePattern piece = movePattern piece
-
