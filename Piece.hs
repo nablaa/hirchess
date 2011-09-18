@@ -1,7 +1,7 @@
 module Piece (Piece(..), Color(..), Type(..), Castling(..),
               printPiece, printBigPiece, printBigPieceColored, moveDirections, moveSquares,
-              attackSquares, opponent, parsePiece, getEnPassantTargetSquare, getCastling,
-              getCastlingSquares, isPromotionSquare, pieceTypeString, isDoubleMove,
+              attackSquares, opponent, parsePiece, getCastling, getCastlingSquares,
+              isPromotionSquare, pieceTypeString, isDoubleMove,
               getInvalidatedCastlings, getCastlings, fromEnPassantTargetSquare,
               toEnPassantTargetSquare, ansiColor) where
 
@@ -98,17 +98,15 @@ moveSquares square piece = fromDiff moveSquaresDiff square piece
 attackSquares :: (Int, Int) -> Piece -> [(Int, Int)]
 attackSquares = fromDiff attackSquaresDiff
 
-getEnPassantTargetSquare :: (Int, Int) -> Color -> (Int, Int)
-getEnPassantTargetSquare (x, y) White = (x - 1, y)
-getEnPassantTargetSquare (x, y) Black = (x + 1, y)
+enPassantConversion :: Int -> (Int, Int) -> (Int, Int)
+enPassantConversion n (x, y) | x <= 3 = (x + n, y)
+                             | otherwise = (x - n, y)
 
 fromEnPassantTargetSquare :: (Int, Int) -> (Int, Int)
-fromEnPassantTargetSquare (x, y) | x <= 3 = (x - 1, y)
-                                 | otherwise = (x + 1, y)
+fromEnPassantTargetSquare = enPassantConversion (-1)
 
 toEnPassantTargetSquare :: (Int, Int) -> (Int, Int)
-toEnPassantTargetSquare (x, y) | x <= 3 = (x + 1, y)
-                               | otherwise = (x - 1, y)
+toEnPassantTargetSquare = enPassantConversion 1
 
 getCastling :: Color -> (Int, Int) -> (Int, Int) -> Maybe Castling
 getCastling White (7, 4) (7, 0) = Just (Long White)

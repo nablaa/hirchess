@@ -25,7 +25,7 @@ writeCastlings = sort . concatMap toString
 
 writeEnPassant :: Maybe Coordinates -> String
 writeEnPassant Nothing = "-"
-writeEnPassant (Just square) = coordinatesToString $ fromEnPassantTargetSquare square
+writeEnPassant (Just square) = coordinatesToString square
 
 writeFEN :: GameState -> String
 writeFEN state = unwords [writeBoard (board state), writePlayer (player state), writeCastlings (castlingsPossible state), writeEnPassant (enPassantSquare state), show (halfmoveClock state), show (moveNumber state)]
@@ -65,7 +65,7 @@ readEnPassant :: String -> Maybe (Maybe Coordinates)
 readEnPassant "-" = Just Nothing
 readEnPassant str = case stringToCoordinates str of
                       Nothing -> Nothing
-                      coordinates -> Just (fmap toEnPassantTargetSquare coordinates)
+                      coordinates -> Just coordinates
 
 maybeRead :: Read a => String -> Maybe a
 maybeRead = fmap fst . listToMaybe . filter (null . snd) . reads

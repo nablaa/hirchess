@@ -32,7 +32,7 @@ applyMove (State board player castlings enpassant halfmove moves) move@(Move (En
 applyMove (State board player castlings enpassant halfmove moves) move@(Move (Promotion _) _ _ _)
     = setHalfMoves (incrMoves (State (applyMoveBoard board move) (opponent player) castlings Nothing halfmove moves)) move
 applyMove (State board player castlings enpassant halfmove moves) move@(Move (PawnDoubleMove) _ _ end)
-    = setHalfMoves (incrMoves (State (applyMoveBoard board move) (opponent player) castlings (Just end) halfmove moves)) move
+    = setHalfMoves (incrMoves (State (applyMoveBoard board move) (opponent player) castlings (Just $ fromEnPassantTargetSquare end) halfmove moves)) move
 
 incrMoves :: GameState -> GameState
 incrMoves state | player state == White = state { moveNumber = moveNumber state + 1 }

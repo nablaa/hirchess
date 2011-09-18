@@ -65,7 +65,7 @@ applyMoveBoard board (Move (Castling (Long White)) _ start end) = movePiece (mov
 applyMoveBoard board (Move (Castling (Short White)) _ start end) = movePiece (movePiece board (7, 4) (7, 6)) (7, 7) (7, 5)
 applyMoveBoard board (Move (Castling (Long Black)) _ start end) = movePiece (movePiece board (0, 4) (0, 2)) (0, 0) (0, 3)
 applyMoveBoard board (Move (Castling (Short Black)) _ start end) = movePiece (movePiece board (0, 4) (0, 6)) (0, 7) (0, 5)
-applyMoveBoard board (Move (EnPassant targetSquare) piece start end) = removePiece (movePiece board start end) targetSquare
+applyMoveBoard board (Move (EnPassant _) piece start end) = removePiece (movePiece board start end) (toEnPassantTargetSquare end)
 applyMoveBoard board (Move (Promotion promoted) piece start end) = addPiece (removePiece board start) end promoted
 applyMoveBoard board (Move PawnDoubleMove piece start end) = movePiece board start end
 
@@ -106,17 +106,15 @@ getEnPassantMove (State board player _ (Just square) _ _) start end
     | startPiece /= Just (Piece Pawn player) = Nothing
     | endPiece /= Nothing = Nothing
     | end `notElem` attackSquares start piece = Nothing
-    | targetSquare /= square = Nothing
+    | end /= square = Nothing
     | targetPiece /= Just (Piece Pawn (opponent player)) = Nothing
     where startPiece = getPiece board start
           (Just piece) = startPiece
           endPiece = getPiece board end
-          targetSquare = getEnPassantTargetSquare end player
+          targetSquare = toEnPassantTargetSquare end
           targetPiece = getPiece board targetSquare
-getEnPassantMove (State board player _ _ _ _) start end = Just $ Move (EnPassant targetSquare) piece start end
+getEnPassantMove (State board player _ _ _ _) start end = Just $ Move (EnPassant end) piece start end
     where (Just piece) = getPiece board start
-          targetSquare = getEnPassantTargetSquare end player
-
 
 longAlgebraicNotation' :: Move -> String -> String
 longAlgebraicNotation' (Move _ (Piece pieceType _) start end) separator = pieceStr ++ startStr ++ separator ++ endStr
