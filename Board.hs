@@ -2,7 +2,8 @@ module Board (Board, Coordinates, initialBoard, emptyBoard,
               printBoard, parseBoard, printPrettyBoard, printBigPrettyBoard, printBigPrettyColoredBoard,
               printSquares, canMove, canCapture, getPiece, getPlayer, isColor, getReachable, addPiece,
               removePiece, movePiece, addPieces, isChecked, isCheck, isEmpty, debugPrintBoard,
-              coordinatesToString, stringToCoordinates, allCoordinates) where
+              coordinatesToString, stringToCoordinates, allCoordinates, isPromotionSquare,
+              isDoubleMove) where
 
 import Data.Char
 import Data.Maybe
@@ -115,6 +116,16 @@ isCheck board player = isChecked board player kingSquare
     where kingSquare = fromJust $ rlookup (Square (Piece King player)) $ assocs board
           rlookup x = lookup x . map swap
           swap (x, y) = (y, x)
+
+isPromotionSquare :: Coordinates -> Color -> Bool
+isPromotionSquare (0, _) White = True
+isPromotionSquare (7, _) Black = True
+isPromotionSquare _ _ = False
+
+isDoubleMove :: Coordinates -> Coordinates -> Color -> Bool
+isDoubleMove (6, _) (4, _) White = True
+isDoubleMove (1, _) (3, _) Black = True
+isDoubleMove _ _ _ = False
 
 squareToChar :: Square -> Char
 squareToChar Empty = ' '

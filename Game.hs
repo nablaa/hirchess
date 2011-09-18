@@ -34,6 +34,14 @@ applyMove (State board player castlings enpassant halfmove moves) move@(Move (Pr
 applyMove (State board player castlings enpassant halfmove moves) move@(Move (PawnDoubleMove) _ _ end)
     = setHalfMoves (incrMoves (State (applyMoveBoard board move) (opponent player) castlings (Just $ fromEnPassantTargetSquare end) halfmove moves)) move
 
+getInvalidatedCastlings :: Piece -> (Int, Int) -> [Castling]
+getInvalidatedCastlings (Piece King color) _ = [Long color, Short color]
+getInvalidatedCastlings (Piece Rook White) (7, 0) = [Long White]
+getInvalidatedCastlings (Piece Rook White) (7, 7) = [Short White]
+getInvalidatedCastlings (Piece Rook Black) (0, 0) = [Long Black]
+getInvalidatedCastlings (Piece Rook Black) (0, 7) = [Short Black]
+getInvalidatedCastlings _ _ = []
+
 incrMoves :: GameState -> GameState
 incrMoves state | player state == White = state { moveNumber = moveNumber state + 1 }
                 | otherwise = state

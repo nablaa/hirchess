@@ -1,8 +1,7 @@
 module Piece (Piece(..), Color(..), Type(..), Castling(..),
               printPiece, printBigPiece, printBigPieceColored, moveDirections, moveSquares,
-              attackSquares, opponent, parsePiece, getCastling, getCastlingSquares,
-              isPromotionSquare, pieceTypeString, isDoubleMove,
-              getInvalidatedCastlings, getCastlings, fromEnPassantTargetSquare,
+              attackSquares, opponent, parsePiece, getCastling, getCastlings,
+              getCastlingSquares, pieceTypeString, fromEnPassantTargetSquare,
               toEnPassantTargetSquare, ansiColor) where
 
 import Data.Maybe
@@ -44,9 +43,9 @@ printPiece (Piece t color) = case color of
     where (Just c) = lookup t pieceChars
 
 printBigPiece :: Piece -> String
-printBigPiece p@(Piece _ color) = case color of
-                                  White -> toUpper (printPiece p) : "W"
-                                  Black -> toUpper (printPiece p) : "B"
+printBigPiece p@(Piece _ color) = toUpper (printPiece p) : case color of
+                                  White -> "W"
+                                  Black -> "B"
 
 printBigPieceColored :: Piece -> String
 printBigPieceColored p@(Piece _ color) = withColor (ansiColor color) [printPiece p, ' ']
@@ -118,26 +117,8 @@ getCastling _ _ _ = Nothing
 getCastlings :: Color -> [Castling]
 getCastlings color = [Long color, Short color]
 
-getInvalidatedCastlings :: Piece -> (Int, Int) -> [Castling]
-getInvalidatedCastlings (Piece King color) _ = [Long color, Short color]
-getInvalidatedCastlings (Piece Rook White) (7, 0) = [Long White]
-getInvalidatedCastlings (Piece Rook White) (7, 7) = [Short White]
-getInvalidatedCastlings (Piece Rook Black) (0, 0) = [Long Black]
-getInvalidatedCastlings (Piece Rook Black) (0, 7) = [Short Black]
-getInvalidatedCastlings _ _ = []
-
 getCastlingSquares :: Castling -> [(Int, Int)]
 getCastlingSquares (Long White) = [(7, y) | y <- [0..4]]
 getCastlingSquares (Short White) = [(7, y) | y <- [4..7]]
 getCastlingSquares (Long Black) = [(0, y) | y <- [0..4]]
 getCastlingSquares (Short Black) = [(0, y) | y <- [4..7]]
-
-isPromotionSquare :: (Int, Int) -> Color -> Bool
-isPromotionSquare (0, _) White = True
-isPromotionSquare (7, _) Black = True
-isPromotionSquare _ _ = False
-
-isDoubleMove :: (Int, Int) -> (Int, Int) -> Color -> Bool
-isDoubleMove (6, _) (4, _) White = True
-isDoubleMove (1, _) (3, _) Black = True
-isDoubleMove _ _ _ = False
