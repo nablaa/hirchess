@@ -30,6 +30,9 @@ emptyBoard = listArray ((0, 0), (7, 7)) (repeat Empty)
 allCoordinates :: [Coordinates]
 allCoordinates = indices emptyBoard
 
+isInsideBoard :: Coordinates -> Bool
+isInsideBoard (i, j) = i >= 0 && i <= 7 && j >= 0 && j <= 7
+
 getPiece :: Board -> Coordinates -> Maybe Piece
 getPiece board coordinates | inRange (bounds board) coordinates = f $ board ! coordinates
                            where f Empty = Nothing
@@ -46,9 +49,6 @@ isEmpty b c = getPiece b c == Nothing
 
 isPlayer :: Board -> Coordinates -> Color -> Bool
 isPlayer b c color = Just color == getPlayer b c
-
-isInsideBoard :: Coordinates -> Bool
-isInsideBoard (i, j) = i >= 0 && i <= 7 && j >= 0 && j <= 7
 
 updateBoard :: Board -> Coordinates -> Square -> Board
 updateBoard board coordinates square = board // [(coordinates, square)]
