@@ -1,8 +1,8 @@
-module Board (Board, Coordinates, initialBoard, emptyBoard,
-              printBoard, parseBoard, printPrettyBoard, printBigPrettyBoard, printBigPrettyColoredBoard,
-              printSquares, canMove, canCapture, getPiece, getPlayer, isColor, getReachable, addPiece,
-              removePiece, movePiece, addPieces, isChecked, isCheck, isEmpty, debugPrintBoard,
-              coordinatesToString, stringToCoordinates, allCoordinates, isPromotionSquare,
+module Board (Board, Coordinates, initialBoard, parseBoardCompact, printBoardCompact,
+              printPrettyBoard, printBigPrettyBoard, printBigPrettyColoredBoard,
+              canMove, canCapture, getPiece, getPlayer, addPiece, removePiece,
+              movePiece, isChecked, isCheck, isEmpty, coordinatesToString,
+              stringToCoordinates, allCoordinates, isPromotionSquare,
               isDoubleMove) where
 
 import Data.Char
@@ -44,8 +44,8 @@ getPlayer b c = case getPiece b c of
 isEmpty :: Board -> Coordinates -> Bool
 isEmpty b c = getPiece b c == Nothing
 
-isColor :: Board -> Coordinates -> Color -> Bool
-isColor b c color = Just color == getPlayer b c
+isPlayer :: Board -> Coordinates -> Color -> Bool
+isPlayer b c color = Just color == getPlayer b c
 
 isInsideBoard :: Coordinates -> Bool
 isInsideBoard (i, j) = i >= 0 && i <= 7 && j >= 0 && j <= 7
@@ -72,7 +72,7 @@ iterateDirection' :: Board -> Color -> Coordinates -> Coordinates -> [Coordinate
 iterateDirection' board color square@(x, y) direction@(dx ,dy) squares
     | not $ isInsideBoard square = squares
     | isEmpty board square = iterateDirection' board color (x + dx, y + dy) direction (square : squares)
-    | otherwise = if isColor board square color then
+    | otherwise = if isPlayer board square color then
                       squares
                   else
                       square : squares
@@ -91,7 +91,7 @@ canMove board piece start end = isInsideBoard start && isInsideBoard end
                                 && isEmpty board end && end `elem` getReachable board piece start
 
 canCapture :: Board -> Piece -> Coordinates -> Coordinates -> Bool
-canCapture board (Piece _ color) start end = isColor board end (opponent color) && threatens board end start
+canCapture board (Piece _ color) start end = isPlayer board end (opponent color) && threatens board end start
 
 threatens :: Board -> Coordinates -> Coordinates -> Bool
 threatens board end start = case piece of
@@ -127,8 +127,8 @@ squareToChar :: Square -> Char
 squareToChar Empty = ' '
 squareToChar (Square p) = printPiece p
 
-printBoard :: Board -> String
-printBoard board = toLines $ foldr f "" (elems board)
+printBoardCompact :: Board -> String
+printBoardCompact board = toLines $ foldr f "" (elems board)
     where f = (:) . squareToChar
           toLines [] = []
           toLines str = take 8 str ++ "\n" ++ toLines (drop 8 str)
@@ -181,13 +181,10 @@ parseBoard' [] = []
 parseBoard' ('\n':xs) = parseBoard' xs
 parseBoard' (x:xs) = parsePiece x : parseBoard' xs
 
-parseBoard :: String -> Maybe Board
-parseBoard str | length pieces == 64 = Just $ boardFromPieces pieces
-               | otherwise = Nothing
+parseBoardCompact :: String -> Maybe Board
+parseBoardCompact str | length pieces == 64 = Just $ boardFromPieces pieces
+                      | otherwise = Nothing
     where pieces = parseBoard' str
-
-debugPrintBoard :: Board -> IO ()
-debugPrintBoard = putStrLn . printBigPrettyBoard
 
 boardFromPieces :: [Maybe Piece] -> Board
 boardFromPieces pieces = listArray ((0, 0), (7, 7)) $ map f pieces

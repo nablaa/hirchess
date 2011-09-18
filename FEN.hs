@@ -8,7 +8,7 @@ import Board
 import Piece
 
 writeBoard :: Board -> String
-writeBoard = intercalate "/" . lines . concatMap emptyToNum . group . printBoard
+writeBoard = intercalate "/" . lines . concatMap emptyToNum . group . printBoardCompact
     where emptyToNum str@(' ':_) = show $ length str
           emptyToNum str = str
 
@@ -43,7 +43,7 @@ readFEN str | length parts /= 6 = Nothing
 
 readBoard :: String -> Maybe Board
 readBoard str | length parts /= 8 = Nothing
-              | otherwise = parseBoard $ unlines parts
+              | otherwise = parseBoardCompact $ unlines parts
     where numToEmpty x | isNumber x = replicate (digitToInt x) ' '
                        | otherwise = [x]
           parts = split (== '/') $ concatMap numToEmpty str
