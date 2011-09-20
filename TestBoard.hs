@@ -46,12 +46,6 @@ prop_pawnDoubleMove (Coordinate column) color = case color of
 
 equal a b = nub (sort a) == nub (sort b)
 
-prop_crosscheckMoveSquares (Coordinate x, Coordinate y) pieceType color
-    = equal (moveSquares coordinates piece) (getReachable emptyBoard piece coordinates)
-      where coordinates = (x, y)
-            piece = Piece pieceType color
-
-
 {-
    +----+----+----+----+----+----+----+----+
 8  |    |    |    |    |    |    |    |    |
@@ -81,6 +75,14 @@ testQueenMove = equal squares moveable
           moveable = [(0, 1), (1, 1), (2, 1), (2, 3), (3, 0), (3, 1), (3, 2), (4, 0), (4, 2), (4, 3), (4, 4), (4, 5), (4, 6), (4, 7), (5, 0), (5, 1), (5, 2), (6, 3), (7, 4)]
           squares = filter (canMove board piece start) allSquares
 
+addPieces :: Board -> [(Coordinates, Piece)] -> Board
+addPieces board list = foldr f board list
+    where f (coordinates, piece) b = addPiece b coordinates piece
+
+emptyBoard :: Board
+emptyBoard = foldr f initialBoard allCoordinates
+    where f coordinates b = removePiece b coordinates
+
 
 options = TestOptions
           { no_of_tests         = 200
@@ -89,6 +91,5 @@ options = TestOptions
 
 main = runTests "complex" options
        [ run prop_pawnDoubleMove
-       , run prop_crosscheckMoveSquares
        , run testQueenMove
         ]
