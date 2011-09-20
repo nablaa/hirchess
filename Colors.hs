@@ -36,11 +36,22 @@ whiteBG ="\x1b[47m"
 defaultBG ="\x1b[49m"
 
 
+boardColor :: ANSIColor
 boardColor = yellow
+
+coordinateColor :: ANSIColor
 coordinateColor = cyan
+
+whitePlayerColor :: ANSIColor
 whitePlayerColor = white
+
+blackPlayerColor :: ANSIColor
 blackPlayerColor = blue
+
+promptColor :: ANSIColor
 promptColor = magenta
+
+errorColor :: ANSIColor
 errorColor = red
 
 
