@@ -1,9 +1,9 @@
 module Board (Board, Coordinates, initialBoard, parseBoardCompact, printBoardCompact,
-              printPrettyBoard, printBigPrettyBoard, printBigPrettyColoredBoard,
-              canMove, canCapture, getPiece, getPlayer, addPiece, removePiece,
-              movePiece, isChecked, isCheck, isEmpty, coordinatesToString,
-              stringToCoordinates, allCoordinates, isPromotionSquare, captureSquares,
-              isDoubleMove, fromEnPassantTargetSquare, toEnPassantTargetSquare) where
+              printBoard, printBoardColored, canMove, canCapture, getPiece, getPlayer,
+              addPiece, removePiece, movePiece, isChecked, isCheck, isEmpty,
+              coordinatesToString, stringToCoordinates, allCoordinates,
+              isPromotionSquare, captureSquares, isDoubleMove,
+              fromEnPassantTargetSquare, toEnPassantTargetSquare) where
 
 import Data.Char
 import Data.Maybe
@@ -167,44 +167,39 @@ printBoardCompact board = toLines $ foldr f "" (elems board)
           toLines [] = []
           toLines str = take 8 str ++ "\n" ++ toLines (drop 8 str)
 
-printPrettyBoard :: Board -> String
-printPrettyBoard board = toLines 8 $ foldr f "" (elems board)
-    where f sq str = '|' : squareToChar sq : str
-          toLines _ [] = line ++ "\n   a b c d e f g h"
-          toLines n str = line ++ "\n" ++ [intToDigit n] ++ " " ++ take 16 str ++ "|\n" ++ toLines (n - 1) (drop 16 str)
-          line = "  " ++ concat (replicate 8 "+-") ++ "+"
+printBoard :: Board -> String
+printBoard = printBoard' False
 
-printBigPrettyBoard :: Board -> String
-printBigPrettyBoard board = toLines 8 $ foldr f "" (elems board)
-    where f sq str = "|" ++ squareToString sq ++ str
-          toLines _ [] = line ++ "\n     a    b    c    d    e    f    g    h"
-          toLines n str = line ++ "\n" ++ [intToDigit n] ++ "  " ++ take 40 str ++ "|\n" ++ toLines (n - 1) (drop 40 str)
-          line = "   " ++ concat (replicate 8 "+----") ++ "+"
-          squareToString Empty = "    "
-          squareToString (Square p) = " " ++ printBigPiece p ++ " "
+printBoardColored :: Board -> String
+printBoardColored = printBoard' True
 
-printBigPrettyColoredBoard :: Board -> String
-printBigPrettyColoredBoard = addCoordinatesColored . printRowsColored . intoRows . elems
+printBoard' :: Bool -> Board -> String
+printBoard' colored = addCoordinates colored . printRows colored . intoRows . elems
     where intoRows [] = []
           intoRows xs = take 8 xs : intoRows (drop 8 xs)
 
-addCoordinatesColored :: String -> String
-addCoordinatesColored str = unlines (init (zipWith (++) numbers (lines str))) ++ cColor "    a   b   c   d   e   f   g   h\n"
-    where cColor = withColor coordinateColor
-          numbers = (map cColor . concat . transpose) [repeat "  ", reverse [intToDigit n : " " | n <- [1..8]]]
+addCoordinates :: Bool -> String -> String
+addCoordinates colored str = unlines (zipWith (++) numbers (lines str)) ++ cColor chars
+    where numbers = map cColor $ lines $ unlines $ ["  \n" ++ intToDigit n : " " | n <- [1..8]] ++ ["  "]
+          chars = "    a   b   c   d   e   f   g   h\n"
+          cColor | colored = withColor coordinateColor
+                 | otherwise = id
 
-printSquareColored :: Square -> String
-printSquareColored Empty = "   "
-printSquareColored (Square p) = " " ++ printBigPieceColored p ++ ""
+printSquare :: Bool ->  Square -> String
+printSquare _ Empty = "   "
+printSquare True (Square p) = " " ++ printPieceColored p ++ " "
+printSquare False (Square p) = " " ++ [printPiece p] ++ " "
 
-printRowColored :: [Square] -> String
-printRowColored row = sep ++ intercalate sep (map printSquareColored row) ++ sep ++ "\n"
-    where bColor = withColor boardColor
+printRow :: Bool -> [Square] -> String
+printRow colored row = sep ++ intercalate sep (map (printSquare colored) row) ++ sep ++ "\n"
+    where bColor | colored = withColor boardColor
+                 | otherwise = id
           sep = bColor "|"
 
-printRowsColored :: [[Square]] -> String
-printRowsColored rows = line ++ intercalate line (map printRowColored rows) ++ line
-    where bColor = withColor boardColor
+printRows :: Bool -> [[Square]] -> String
+printRows colored rows = line ++ intercalate line (map (printRow colored) rows) ++ line
+    where bColor | colored = withColor boardColor
+                 | otherwise = id
           line = bColor $ concat (replicate 8 "+---") ++ "+\n"
 
 printSquares :: (Board -> String) -> [Coordinates] -> String

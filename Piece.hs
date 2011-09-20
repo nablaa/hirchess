@@ -1,5 +1,5 @@
 module Piece (Piece(..), Color(..), Type(..),
-              printPiece, printBigPiece, printBigPieceColored, parsePiece, opponent,
+              printPiece, printPieceColored, parsePiece, opponent,
               movePattern, capturePattern) where
 
 import Data.Maybe
@@ -49,13 +49,8 @@ printPiece (Piece t color) = case color of
                                Black -> toLower c
     where (Just c) = lookup t pieceChars
 
-printBigPiece :: Piece -> String
-printBigPiece p@(Piece _ color) = toUpper (printPiece p) : case color of
-                                  White -> "W"
-                                  Black -> "B"
-
-printBigPieceColored :: Piece -> String
-printBigPieceColored p@(Piece _ color) = withColor (printColor color) [printPiece p, ' ']
+printPieceColored :: Piece -> String
+printPieceColored p@(Piece t color) = withColor (printColor color) [printPiece p]
     where printColor White = whitePlayerColor
           printColor Black = blackPlayerColor
 

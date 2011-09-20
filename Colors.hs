@@ -1,4 +1,4 @@
-module Colors (withColor, boardColor, coordinateColor,
+module Colors (ANSIColor, withColor, boardColor, coordinateColor,
                whitePlayerColor, blackPlayerColor, promptColor, errorColor) where
 
 type ANSIColor = String

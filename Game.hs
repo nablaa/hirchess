@@ -54,7 +54,7 @@ setHalfMoves state (Move _ (Piece Pawn _) _ _) = state { halfmoveClock = 0 }
 setHalfMoves state _ = state { halfmoveClock = halfmoveClock state + 1 }
 
 printColoredState :: GameState -> String
-printColoredState state = printBigPrettyColoredBoard (board state) ++ "\n\n"
+printColoredState state = printBoardColored (board state) ++ "\n\n"
                           ++ "Current player: " ++ withColor (playerColor color) (show color)
                           ++ "\t\tMove number: " ++ show (moveNumber state) ++ "\n"
                           ++ "FEN: " ++ writeFEN state
