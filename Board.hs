@@ -180,7 +180,7 @@ printBoard' colored = addCoordinates colored . printRows colored . intoRows . el
 
 addCoordinates :: Bool -> String -> String
 addCoordinates colored str = unlines (zipWith (++) numbers (lines str)) ++ cColor chars
-    where numbers = map cColor $ lines $ unlines $ ["  \n" ++ intToDigit n : " " | n <- [1..8]] ++ ["  "]
+    where numbers = map cColor $ lines $ unlines $ ["  \n" ++ intToDigit n : " " | n <- reverse [1..8]] ++ ["  "]
           chars = "    a   b   c   d   e   f   g   h\n"
           cColor | colored = withColor coordinateColor
                  | otherwise = id
