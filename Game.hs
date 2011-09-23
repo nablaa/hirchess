@@ -54,10 +54,19 @@ setHalfMoves state (Move _ (Piece Pawn _) _ _) = state { halfmoveClock = 0 }
 setHalfMoves state _ = state { halfmoveClock = halfmoveClock state + 1 }
 
 printColoredState :: GameState -> String
-printColoredState state = printBoardColored (board state) ++ "\n\n"
+printColoredState state = join "    " (printBoardColored (board state) ++ "\n\n"
                           ++ "Current player: " ++ withColor (playerColor color) (show color)
                           ++ "\t\tMove number: " ++ show (moveNumber state) ++ "\n"
-                          ++ "FEN: " ++ writeFEN state
+                          ++ "FEN: " ++ writeFEN state) (printMoveHistory state ++ unlines (repeat "\n"))
     where color = player state
           playerColor White = whitePlayerColor
           playerColor Black = blackPlayerColor
+
+printMoveHistory :: GameState -> String
+printMoveHistory state = join ". " numbers list
+    where list = printMoveListColumns (reverse (moveHistory state))
+          numbers = unlines [show x | x <- [1..]]
+
+
+join :: String ->  String -> String -> String
+join sep str1 str2 = unlines $ zipWith (\x y -> x ++ sep ++ y) (lines str1) (lines str2)

@@ -1,6 +1,7 @@
 module Move (GameState(..), Move(..), MoveType(..), Castling(..),
              getMove, isLegalMove, getAllLegalMoves, applyMoveBoard,
-             longAlgebraicNotation, parseLongAlgebraicNotation, debugPrintMoves) where
+             longAlgebraicNotation, parseLongAlgebraicNotation,
+             printMoveList, printMoveListColumns) where
 
 import Data.Maybe
 import Data.List
@@ -158,5 +159,11 @@ parseLongAlgebraicNotation (c1:r1:'-':c2:r2:[]) = do coord1 <- coord1'
           coord2' = stringToCoordinates [c2, r2]
 parseLongAlgebraicNotation _ = Nothing
 
-debugPrintMoves :: [Move] -> String
-debugPrintMoves = unlines . map longAlgebraicNotation
+
+printMoveList :: [Move] -> String
+printMoveList = unlines . map longAlgebraicNotation
+
+printMoveListColumns :: [Move] -> String
+printMoveListColumns [] = []
+printMoveListColumns (white:black:rest) = longAlgebraicNotation white ++ "  " ++ longAlgebraicNotation black ++ "\n" ++ printMoveListColumns rest
+printMoveListColumns [move] = longAlgebraicNotation move
