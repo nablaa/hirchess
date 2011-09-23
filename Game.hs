@@ -8,7 +8,7 @@ import FEN
 import Colors
 
 initialState :: GameState
-initialState = State initialBoard White initialCastlings Nothing 0 1
+initialState = State initialBoard White initialCastlings Nothing 0 1 []
     where initialCastlings = [Long White, Short White, Long Black, Short Black]
 
 hasEnded :: GameState -> Bool
@@ -21,18 +21,18 @@ isDraw :: GameState -> Bool
 isDraw = undefined
 
 applyMove :: GameState -> Move -> GameState
-applyMove (State board player castlings enpassant halfmove moves) move@(Move Movement piece start _)
-    = setHalfMoves (incrMoves (State (applyMoveBoard board move) (opponent player) (castlings \\ getInvalidatedCastlings piece start) Nothing halfmove moves)) move
-applyMove (State board player castlings enpassant halfmove moves) move@(Move Capture piece start _)
-    = setHalfMoves (incrMoves (State (applyMoveBoard board move) (opponent player) (castlings \\ getInvalidatedCastlings piece start) Nothing halfmove moves)) move
-applyMove (State board player castlings enpassant halfmove moves) move@(Move (Castling _) _ _ _)
-    = setHalfMoves (incrMoves (State (applyMoveBoard board move) (opponent player) (castlings \\ getCastlings player) Nothing halfmove moves)) move
-applyMove (State board player castlings enpassant halfmove moves) move@(Move (EnPassant _) _ _ _)
-    = setHalfMoves (incrMoves (State (applyMoveBoard board move) (opponent player) castlings Nothing halfmove moves)) move
-applyMove (State board player castlings enpassant halfmove moves) move@(Move (Promotion _) _ _ _)
-    = setHalfMoves (incrMoves (State (applyMoveBoard board move) (opponent player) castlings Nothing halfmove moves)) move
-applyMove (State board player castlings enpassant halfmove moves) move@(Move (PawnDoubleMove) _ _ end)
-    = setHalfMoves (incrMoves (State (applyMoveBoard board move) (opponent player) castlings (Just $ fromEnPassantTargetSquare end) halfmove moves)) move
+applyMove (State board player castlings enpassant halfmove moves history) move@(Move Movement piece start _)
+    = setHalfMoves (incrMoves (State (applyMoveBoard board move) (opponent player) (castlings \\ getInvalidatedCastlings piece start) Nothing halfmove moves (move:history))) move
+applyMove (State board player castlings enpassant halfmove moves history) move@(Move Capture piece start _)
+    = setHalfMoves (incrMoves (State (applyMoveBoard board move) (opponent player) (castlings \\ getInvalidatedCastlings piece start) Nothing halfmove moves (move:history))) move
+applyMove (State board player castlings enpassant halfmove moves history) move@(Move (Castling _) _ _ _)
+    = setHalfMoves (incrMoves (State (applyMoveBoard board move) (opponent player) (castlings \\ getCastlings player) Nothing halfmove moves (move:history))) move
+applyMove (State board player castlings enpassant halfmove moves history) move@(Move (EnPassant _) _ _ _)
+    = setHalfMoves (incrMoves (State (applyMoveBoard board move) (opponent player) castlings Nothing halfmove moves (move:history))) move
+applyMove (State board player castlings enpassant halfmove moves history) move@(Move (Promotion _) _ _ _)
+    = setHalfMoves (incrMoves (State (applyMoveBoard board move) (opponent player) castlings Nothing halfmove moves (move:history))) move
+applyMove (State board player castlings enpassant halfmove moves history) move@(Move (PawnDoubleMove) _ _ end)
+    = setHalfMoves (incrMoves (State (applyMoveBoard board move) (opponent player) castlings (Just $ fromEnPassantTargetSquare end) halfmove moves (move:history))) move
 
 getInvalidatedCastlings :: Piece -> Coordinates -> [Castling]
 getInvalidatedCastlings (Piece King color) _ = [Long color, Short color]

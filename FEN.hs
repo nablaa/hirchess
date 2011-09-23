@@ -38,7 +38,7 @@ readFEN str | length parts /= 6 = Nothing
                              enPassant <- readEnPassant $ parts !! 3
                              halfmoves <- maybeRead $ parts !! 4
                              moves <- maybeRead $ parts !! 5
-                             return $ State board player castlings enPassant halfmoves moves
+                             return $ State board player castlings enPassant halfmoves moves []
     where parts = words str
 
 readBoard :: String -> Maybe Board
