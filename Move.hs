@@ -138,7 +138,7 @@ longAlgebraicNotation' :: Move -> String -> String
 longAlgebraicNotation' (Move _ (Piece pieceType _) start end) separator = pieceStr ++ startStr ++ separator ++ endStr
     where pieceStr = case pieceType of
                        Pawn -> ""
-                       _ -> [printPiece (Piece pieceType White)]
+                       _ -> printPiece (Piece pieceType White)
           startStr = coordinatesToString start
           endStr = coordinatesToString end
 
@@ -148,7 +148,7 @@ longAlgebraicNotation move@(Move Capture _ _ _) = longAlgebraicNotation' move "x
 longAlgebraicNotation (Move (Castling (Long _)) _ _ _) = "O-O-O"
 longAlgebraicNotation (Move (Castling (Short _)) _ _ _) = "O-O"
 longAlgebraicNotation move@(Move (EnPassant _) _ _ _) = longAlgebraicNotation' move "x"
-longAlgebraicNotation move@(Move (Promotion (Piece promoted _)) _ _ _) = longAlgebraicNotation' move "-" ++ [printPiece (Piece promoted White)]
+longAlgebraicNotation move@(Move (Promotion (Piece promoted _)) _ _ _) = longAlgebraicNotation' move "-" ++ printPiece (Piece promoted White)
 longAlgebraicNotation move@(Move PawnDoubleMove _ _ _) = longAlgebraicNotation' move "-"
 
 parseLongAlgebraicNotation :: String -> Maybe (Coordinates, Coordinates)

@@ -43,14 +43,14 @@ capturePattern (Piece Pawn White) = [(-1, -1), (-1, 1)]
 capturePattern (Piece Pawn Black) = [(1, -1), (1, 1)]
 capturePattern piece = movePattern piece
 
-printPiece :: Piece -> Char
+printPiece :: Piece -> String
 printPiece (Piece t color) = case color of
-                               White -> toUpper c
-                               Black -> toLower c
+                               White -> [toUpper c]
+                               Black -> [toLower c]
     where (Just c) = lookup t pieceChars
 
 printPieceColored :: Piece -> String
-printPieceColored p@(Piece t color) = withColor (printColor color) [printPiece p]
+printPieceColored p@(Piece t color) = withColor (printColor color) (printPiece p)
     where printColor White = whitePlayerColor
           printColor Black = blackPlayerColor
 

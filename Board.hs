@@ -159,7 +159,7 @@ stringToCoordinates _ = Nothing
 
 squareToChar :: Square -> Char
 squareToChar Empty = ' '
-squareToChar (Square p) = printPiece p
+squareToChar (Square p) = head $ printPiece p
 
 printBoardCompact :: Board -> String
 printBoardCompact board = toLines $ foldr f "" (elems board)
@@ -188,7 +188,7 @@ addCoordinates colored str = unlines (zipWith (++) numbers (lines str)) ++ cColo
 printSquare :: Bool ->  Square -> String
 printSquare _ Empty = "   "
 printSquare True (Square p) = " " ++ printPieceColored p ++ " "
-printSquare False (Square p) = " " ++ [printPiece p] ++ " "
+printSquare False (Square p) = " " ++ printPiece p ++ " "
 
 printRow :: Bool -> [Square] -> String
 printRow colored row = sep ++ intercalate sep (map (printSquare colored) row) ++ sep ++ "\n"
