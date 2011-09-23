@@ -200,7 +200,7 @@ printRows :: Bool -> [[Square]] -> String
 printRows colored rows = line ++ intercalate line (map (printRow colored) rows) ++ line
     where bColor | colored = withColor boardColor
                  | otherwise = id
-          line = bColor $ concat (replicate 8 "+---") ++ "+\n"
+          line = bColor (concat (replicate 8 "+---") ++ "+") ++ "\n"
 
 printSquares :: (Board -> String) -> [Coordinates] -> String
 printSquares f squares = f $ emptyBoard // [(s, Square (Piece Pawn White)) | s <- squares]
