@@ -134,7 +134,9 @@ getCastlingSquares (Short Black) = [(0, c) | c <- [4..7]]
 
 longAlgebraicNotation' :: Move -> String -> String
 longAlgebraicNotation' (Move _ (Piece pieceType _) start end) separator = pieceStr ++ startStr ++ separator ++ endStr
-    where pieceStr = [printPiece (Piece pieceType White)]
+    where pieceStr = case pieceType of
+                       Pawn -> ""
+                       _ -> [printPiece (Piece pieceType White)]
           startStr = coordinatesToString start
           endStr = coordinatesToString end
 
