@@ -12,13 +12,14 @@ initialState = State initialBoard White initialCastlings Nothing 0 1 []
     where initialCastlings = [Long White, Short White, Long Black, Short Black]
 
 hasEnded :: GameState -> Bool
-hasEnded = undefined
+hasEnded state = null (getAllLegalMoves state) || isDraw state
 
 getWinner :: GameState -> Maybe Color
-getWinner = undefined
+getWinner state | null (getAllLegalMoves state) = Just $ opponent $ player state
+                | otherwise = Nothing
 
 isDraw :: GameState -> Bool
-isDraw = undefined
+isDraw state = False
 
 applyMove :: GameState -> Move -> GameState
 applyMove (State board player castlings enpassant halfmove moves history) move@(Move Movement piece start _)
@@ -57,10 +58,22 @@ printColoredState :: GameState -> String
 printColoredState state = join "    " (printBoardColored (board state) ++ "\n\n"
                           ++ "Player: " ++ withColor (playerColor color) (show color)
                           ++ "\t\tMove: " ++ show (moveNumber state) ++ "\n"
-                          ++ "FEN: " ++ writeFEN state) (printMoveHistory state ++ unlines (repeat "\n"))
+                          ++ "FEN: " ++ writeFEN state
+                          ++ endStatus) (printMoveHistory state ++ unlines (repeat "\n"))
     where color = player state
           playerColor White = whitePlayerColor
           playerColor Black = blackPlayerColor
+          endStatus = if hasEnded state then
+                          "\n" ++ withColor notificationColor "Game over: " ++ drawStatus ++ winnerStatus ++ "\n"
+                      else
+                          ""
+          drawStatus = if isDraw state then
+                           withColor notificationColor "The game is a draw"
+                       else
+                           ""
+          winnerStatus = case getWinner state of
+                           Just player -> withColor notificationColor "The winner is: " ++ withColor (playerColor player) (show player)
+                           Nothing -> ""
 
 printMoveHistory :: GameState -> String
 printMoveHistory state = join ". " numbers list

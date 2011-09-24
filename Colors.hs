@@ -1,5 +1,6 @@
 module Colors (ANSIColor, withColor, boardColor, coordinateColor,
-               whitePlayerColor, blackPlayerColor, promptColor, errorColor) where
+               whitePlayerColor, blackPlayerColor, promptColor, errorColor,
+               notificationColor) where
 
 type ANSIColor = String
 
@@ -53,6 +54,9 @@ promptColor = magenta
 
 errorColor :: ANSIColor
 errorColor = red
+
+notificationColor :: ANSIColor
+notificationColor = green
 
 
 withColor :: ANSIColor -> String -> String
