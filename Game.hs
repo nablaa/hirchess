@@ -1,4 +1,4 @@
-module Game (initialState, applyMove, printColoredState) where
+module Game (initialState, applyMove, printColoredState, hasEnded) where
 
 import Data.List
 import Board
