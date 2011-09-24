@@ -1,4 +1,4 @@
-module Game (initialState, applyMove, printColoredState, hasEnded) where
+module Game (initialState, applyMove, printColoredState, getWinner, canClaimDraw) where
 
 import Data.List
 import Board
@@ -12,15 +12,22 @@ initialState :: GameState
 initialState = State initialBoard White initialCastlings Nothing 0 1 []
     where initialCastlings = [Long White, Short White, Long Black, Short Black]
 
-hasEnded :: GameState -> Bool
-hasEnded state = null (getAllLegalMoves state) || isDraw state
-
 getWinner :: GameState -> Maybe Color
 getWinner state | null (getAllLegalMoves state) = Just $ opponent $ player state
                 | otherwise = Nothing
 
-isDraw :: GameState -> Bool
-isDraw state = False
+canClaimDraw :: GameState -> Bool
+canClaimDraw state = halfmoveClock state >= 50 || identicalBoardCount state >= 3
+
+identicalBoardCount :: GameState -> Int
+identicalBoardCount state |length moves >= 1 && b == (board state) = length $ filter (==b) boards
+    where boards = map board $ collectStates initialState moves
+          b = last boards
+          moves = reverse $ moveHistory state
+identicalBoardCount _ = 0
+
+collectStates :: GameState -> [Move] -> [GameState]
+collectStates state moves = scanl applyMove state moves
 
 applyMove :: GameState -> Move -> GameState
 applyMove (State board player castlings enpassant halfmove moves history) move@(Move Movement piece start _)
@@ -60,20 +67,17 @@ printColoredState state = join "    " (printBoardColored (board state) ++ "\n\n"
                           ++ "Player: " ++ withColor (playerColor color) (show color)
                           ++ "\t\tMove: " ++ show (moveNumber state) ++ "\n"
                           ++ "FEN: " ++ writeFEN state
-                          ++ endStatus) (printMoveHistory state ++ unlines (repeat "\n"))
+                          ++ drawStatus
+                          ++ winnerStatus) (printMoveHistory state ++ unlines (repeat "\n"))
     where color = player state
           playerColor White = whitePlayerColor
           playerColor Black = blackPlayerColor
-          endStatus = if hasEnded state then
-                          "\n" ++ withColor notificationColor "Game over: " ++ drawStatus ++ winnerStatus ++ "\n"
-                      else
-                          ""
-          drawStatus = if isDraw state then
-                           withColor notificationColor "The game is a draw"
+          drawStatus = if canClaimDraw state then
+                           "\n" ++ withColor notificationColor "The player can claim draw"
                        else
                            ""
           winnerStatus = case getWinner state of
-                           Just player -> withColor notificationColor "The winner is: " ++ withColor (playerColor player) (show player)
+                           Just player -> "\n" ++ withColor notificationColor "Game over. The winner is " ++ withColor (playerColor player) (show player)
                            Nothing -> ""
 
 printMoveHistory :: GameState -> String

@@ -10,8 +10,7 @@ main = do _ <- debugPlayGame initialState
           putStrLn ""
 
 debugPlayGame :: GameState -> IO (GameState)
-debugPlayGame state | hasEnded state = do putStrLn $ printColoredState state
-                                          return state
+debugPlayGame state | getWinner state /= Nothing = putStrLn (printColoredState state) >> return state
                     | otherwise = do putStrLn $ printColoredState state
                                      putStrLn movePrompt
                                      moveStr <- getLine
@@ -23,8 +22,12 @@ debugPlayGame state | hasEnded state = do putStrLn $ printColoredState state
                                                                              else
                                                                                  putStrLn illegalMove >> debugPlayGame state
                                                                  Nothing -> putStrLn invalidMove >> debugPlayGame state
-                                       Nothing -> putStrLn invalidCoordinates >> debugPlayGame state
-    where movePrompt = withColor promptColor "\nEnter move: "
-          illegalMove = withColor errorColor "Illegal move\n\n"
-          invalidMove = withColor errorColor "Invalid move\n\n"
-          invalidCoordinates = withColor errorColor "Invalid coordinates\n\n"
+                                       Nothing -> if moveStr == "draw" && canClaimDraw state then
+                                                     putStrLn draw >> return state
+                                                 else
+                                                     putStrLn invalidCoordinates >> debugPlayGame state
+    where movePrompt = "\n" ++ withColor promptColor "Enter move: "
+          illegalMove = withColor errorColor "Illegal move" ++ "\n\n"
+          invalidMove = withColor errorColor "Invalid move" ++ "\n\n"
+          invalidCoordinates = withColor errorColor "Invalid coordinates" ++ "\n\n"
+          draw = "\n" ++ withColor notificationColor "Game over. The game is a draw!"
