@@ -78,7 +78,7 @@ printColoredState state = join "    " (printBoardColored (board state) ++ "\n\n"
 
 printMoveHistory :: GameState -> String
 printMoveHistory state = join ". " numbers list
-    where list = printMoveListColumns longAlgebraicNotation (reverse (moveHistory state))
+    where list = printMoveListColumns printLongAlgebraicNotation (reverse (moveHistory state))
           numbers = unlines [show x | x <- [1..]]
 
 join :: String ->  String -> String -> String

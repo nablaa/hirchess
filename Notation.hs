@@ -1,8 +1,12 @@
-module Notation (NotationParser, NotationPrinter, longAlgebraicNotation, parseCoordinateNotation, printMoveList, printMoveListColumns) where
+module Notation (NotationParser, NotationPrinter,
+                 printLongAlgebraicNotation,
+                 printCoordinateNotation, parseCoordinateNotation,
+                 printMoveList, printMoveListColumns) where
 
 import Move
 import Piece
 import Board
+import Data.Char
 
 type NotationParser = GameState -> String -> Maybe (Coordinates, Coordinates)
 type NotationPrinter = Move -> String
@@ -18,21 +22,24 @@ longAlgebraicNotation' (Move _ (Piece pieceType _) start end) separator = pieceS
           startStr = coordinatesToString start
           endStr = coordinatesToString end
 
-longAlgebraicNotation :: NotationPrinter
-longAlgebraicNotation move@(Move Movement _ _ _) = longAlgebraicNotation' move "-"
-longAlgebraicNotation move@(Move Capture _ _ _) = longAlgebraicNotation' move "x"
-longAlgebraicNotation (Move (Castling (Long _)) _ _ _) = "O-O-O"
-longAlgebraicNotation (Move (Castling (Short _)) _ _ _) = "O-O"
-longAlgebraicNotation move@(Move (EnPassant _) _ _ _) = longAlgebraicNotation' move "x"
-longAlgebraicNotation move@(Move (Promotion (Piece promoted _)) _ _ _) = longAlgebraicNotation' move "-" ++ printPiece (Piece promoted White)
-longAlgebraicNotation move@(Move PawnDoubleMove _ _ _) = longAlgebraicNotation' move "-"
+printLongAlgebraicNotation :: NotationPrinter
+printLongAlgebraicNotation move@(Move Movement _ _ _) = longAlgebraicNotation' move "-"
+printLongAlgebraicNotation move@(Move Capture _ _ _) = longAlgebraicNotation' move "x"
+printLongAlgebraicNotation (Move (Castling (Long _)) _ _ _) = "O-O-O"
+printLongAlgebraicNotation (Move (Castling (Short _)) _ _ _) = "O-O"
+printLongAlgebraicNotation move@(Move (EnPassant _) _ _ _) = longAlgebraicNotation' move "x"
+printLongAlgebraicNotation move@(Move (Promotion (Piece promoted _)) _ _ _) = longAlgebraicNotation' move "-" ++ printPiece (Piece promoted White)
+printLongAlgebraicNotation move@(Move PawnDoubleMove _ _ _) = longAlgebraicNotation' move "-"
+
+printCoordinateNotation :: NotationPrinter
+printCoordinateNotation (Move _ _ coord1 coord2) = map toUpper $ coordinatesToString coord1 ++ "-" ++ coordinatesToString coord2
 
 parseCoordinateNotation :: NotationParser
 parseCoordinateNotation _ (c1:r1:'-':c2:r2:[]) = do coord1 <- coord1'
                                                     coord2 <- coord2'
                                                     Just (coord1, coord2)
-    where coord1' = stringToCoordinates [c1, r1]
-          coord2' = stringToCoordinates [c2, r2]
+    where coord1' = stringToCoordinates $ map toLower [c1, r1]
+          coord2' = stringToCoordinates $ map toLower [c2, r2]
 parseCoordinateNotation _ _ = Nothing
 
 printMoveList :: NotationPrinter -> [Move] -> String
