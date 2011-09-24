@@ -3,6 +3,7 @@ module UI () where
 import Game
 import Move
 import Colors
+import Notation
 
 main :: IO ()
 main = do _ <- debugPlayGame initialState
@@ -14,7 +15,7 @@ debugPlayGame state | hasEnded state = do putStrLn $ printColoredState state
                     | otherwise = do putStrLn $ printColoredState state
                                      putStrLn movePrompt
                                      moveStr <- getLine
-                                     let coords = parseLongAlgebraicNotation moveStr
+                                     let coords = parseCoordinateNotation moveStr
                                      case coords of
                                        Just (coord1, coord2) -> case getMove state coord1 coord2 of
                                                                  Just move -> if isLegalMove state move then

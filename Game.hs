@@ -6,6 +6,7 @@ import Piece
 import Move
 import FEN
 import Colors
+import Notation
 
 initialState :: GameState
 initialState = State initialBoard White initialCastlings Nothing 0 1 []
