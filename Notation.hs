@@ -40,5 +40,7 @@ printMoveList f = unlines . map f
 
 printMoveListColumns :: NotationPrinter -> [Move] -> String
 printMoveListColumns _ [] = []
-printMoveListColumns f (white:black:rest) = f white ++ "  " ++ f black ++ "\n" ++ printMoveListColumns f rest
 printMoveListColumns f [move] = f move
+printMoveListColumns f (white:black:rest) = whiteStr ++ padding ++ f black ++ "\n" ++ printMoveListColumns f rest
+    where whiteStr = f white
+          padding = replicate (8 - length whiteStr) ' '
