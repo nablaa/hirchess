@@ -15,7 +15,7 @@ debugPlayGame state | hasEnded state = do putStrLn $ printColoredState state
                     | otherwise = do putStrLn $ printColoredState state
                                      putStrLn movePrompt
                                      moveStr <- getLine
-                                     let coords = parseCoordinateNotation moveStr
+                                     let coords = parseCoordinateNotation state moveStr
                                      case coords of
                                        Just (coord1, coord2) -> case getMove state coord1 coord2 of
                                                                  Just move -> if isLegalMove state move then

@@ -78,9 +78,8 @@ printColoredState state = join "    " (printBoardColored (board state) ++ "\n\n"
 
 printMoveHistory :: GameState -> String
 printMoveHistory state = join ". " numbers list
-    where list = printMoveListColumns (reverse (moveHistory state))
+    where list = printMoveListColumns longAlgebraicNotation (reverse (moveHistory state))
           numbers = unlines [show x | x <- [1..]]
-
 
 join :: String ->  String -> String -> String
 join sep str1 str2 = unlines $ zipWith (\x y -> x ++ sep ++ y) (lines str1) (lines str2)
