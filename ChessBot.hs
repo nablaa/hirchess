@@ -16,7 +16,7 @@ import Colors
 import FEN
 
 data Command = Players | AddPlayer Color String | RemovePlayer Color String
-             | PrintBoard | PrintFEN | PrintStatus
+             | PrintBoard | PrintCompactBoard | PrintFEN | PrintStatus | Help
              | MakeMove String | Undo | NewGame | ClaimDraw | Invalid
                deriving (Eq, Show, Read)
 
@@ -38,6 +38,7 @@ parseCommand str | cmd "!players" = Just Players
                  | cmd "!player" && count >= 3 && arg 1 == "remove" = case player of
                                                                  Just p -> Just $ AddPlayer p (arg 3)
                                                                  Nothing -> Nothing
+                 | cmd "!cboard" = Just PrintCompactBoard
                  | cmd "!board" = Just PrintBoard
                  | cmd "!fen" = Just PrintFEN
                  | cmd "!status" = Just PrintStatus
@@ -45,6 +46,7 @@ parseCommand str | cmd "!players" = Just Players
                  | cmd "!move" && count >= 2 = Just $ MakeMove $ arg 1
                  | cmd "!undo" = Just Undo
                  | cmd "!newgame" = Just NewGame
+                 | cmd "!help" = Just Help
                  | cmd "!" = Just Invalid
     where cmd c = c `isPrefixOf` str
           w = words str
@@ -63,8 +65,10 @@ evalCommand s@(BotState _ whites blacks _) Players = return (players, s)
 --evalCommand s (AddPlayer Black nick) = undefined
 --evalCommand s (RemovePlayer White nick) = undefined
 --evalCommand s (RemovePlayer Black nick) = undefined
-evalCommand s PrintFEN = return ([writeFEN (game s)], s)
 --evalCommand s Undo = undefined
+evalCommand s PrintFEN = return ([writeFEN (game s)], s)
+evalCommand s Help = return (helpText, s)
+evalCommand s@(BotState game _ _ _) PrintCompactBoard = return (lines (printBoardCompact (board game)), s)
 evalCommand s@(BotState game _ _ _) PrintBoard = return (lines (printBoard (board game)), s)
 evalCommand s@(BotState game _ _ _) PrintStatus = return (lines (printColoredState game), s)
 evalCommand s@(BotState game whites blacks cmds) cmd@(MakeMove moveStr)
@@ -92,6 +96,16 @@ evalCommand s@(BotState game _ _ _) ClaimDraw | canClaimDraw game = return (draw
                                               | otherwise = return (["Cannot claim draw"], s)
     where draw = [withColor notificationColor "Game over. The game is a draw!"]
 evalCommand s Invalid = return (["Invalid command"], s)
+evalCommand s _ = return (["Invalid command"], s)
+
+helpText :: [String]
+helpText = ["Available commands:"
+           , "!move MOVE    Makes a move. Move is given in coordinate notation. Example: \"!move b1-c3\"."
+           , "!newgame      Starts a new game."
+           , "!board        Prints the current game board."
+           , "!cboard       Prints the current game board using compact notation."
+           , "!status       Prints the current game status."
+           , "!fen          Prints out the FEN notation of the current game status."]
 
 serialize :: BotState -> String -> IO ()
 serialize = undefined
@@ -105,7 +119,7 @@ runBot h state = do s <- readChannel h
                     case c of
                       Nothing -> runBot h state
                       Just cmd -> do (output, state') <- evalCommand state cmd
-                                     mapM_ (writeChannel (length output >= 4) h) output
+                                     mapM_ (writeChannel (length output > 8) h) output
                                      runBot h state'
 
 main :: IO ()
