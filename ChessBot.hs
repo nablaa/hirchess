@@ -10,6 +10,7 @@ import IRC
 import Game
 import Piece
 import Move
+import Board
 
 data Command = Players | AddPlayer Color String | RemovePlayer Color String
              | PrintBoard | PrintFEN | PrintStatus
@@ -59,9 +60,9 @@ evalCommand s (AddPlayer White nick) = undefined
 evalCommand s (AddPlayer Black nick) = undefined
 evalCommand s (RemovePlayer White nick) = undefined
 evalCommand s (RemovePlayer Black nick) = undefined
-evalCommand s PrintBoard = undefined
+evalCommand s@(BotState game _ _ _) PrintBoard = return (lines (printBoard (board game)), s)
 evalCommand s PrintFEN = undefined
-evalCommand s PrintStatus = undefined
+evalCommand s@(BotState game _ _ _) PrintStatus = return (lines (printColoredState game), s)
 evalCommand s (MakeMove move) = undefined
 evalCommand s Undo = undefined
 evalCommand s NewGame = undefined
