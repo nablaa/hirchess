@@ -58,12 +58,13 @@ parseCommand _ = Nothing
 evalCommand :: BotState -> Command -> IO ([String], BotState)
 evalCommand s@(BotState _ whites blacks _) Players = return (players, s)
     where players = ["White: " ++ unwords whites, "Black: " ++ unwords blacks]
-evalCommand s (AddPlayer White nick) = undefined
-evalCommand s (AddPlayer Black nick) = undefined
-evalCommand s (RemovePlayer White nick) = undefined
-evalCommand s (RemovePlayer Black nick) = undefined
+--evalCommand s (AddPlayer White nick) = undefined
+--evalCommand s (AddPlayer Black nick) = undefined
+--evalCommand s (RemovePlayer White nick) = undefined
+--evalCommand s (RemovePlayer Black nick) = undefined
+--evalCommand s PrintFEN = undefined
+--evalCommand s Undo = undefined
 evalCommand s@(BotState game _ _ _) PrintBoard = return (lines (printBoard (board game)), s)
-evalCommand s PrintFEN = undefined
 evalCommand s@(BotState game _ _ _) PrintStatus = return (lines (printColoredState game), s)
 evalCommand s@(BotState game whites blacks cmds) cmd@(MakeMove moveStr)
     = do let coords = parseCoordinateNotation game moveStr
@@ -85,7 +86,6 @@ evalCommand s@(BotState game whites blacks cmds) cmd@(MakeMove moveStr)
                            else
                                ""
 
-evalCommand s Undo = undefined
 evalCommand s NewGame = return (["Game restarted"], initialBotState)
 evalCommand s@(BotState game _ _ _) ClaimDraw | canClaimDraw game = return (draw, initialBotState)
                                               | otherwise = return (["Cannot claim draw"], s)
