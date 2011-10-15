@@ -43,5 +43,5 @@ readChannel h = do t <- hGetLine h
 
 writeChannel :: Bool -> Handle -> String -> IO ()
 writeChannel _ _ "" = return ()
-writeChannel True h s = threadDelay (floodDelay * 1000) >> write h "PRIVMSG" (chan ++ " :" ++ s) -- prevent flooding
+writeChannel True h s = write h "PRIVMSG" (chan ++ " :" ++ s) >> threadDelay (floodDelay * 1000) -- prevent flooding
 writeChannel False h s = write h "PRIVMSG" (chan ++ " :" ++ s)
