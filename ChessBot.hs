@@ -81,7 +81,7 @@ runBot h state = do s <- readChannel h
                     case c of
                       Nothing -> runBot h state
                       Just cmd -> do (output, state') <- evalCommand state cmd
-                                     mapM_ (writeChannel h) output
+                                     mapM_ (writeChannel (length output >= 4) h) output
                                      runBot h state'
 
 main :: IO ()

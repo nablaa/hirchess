@@ -5,13 +5,14 @@ import System.IO
 import Text.Printf
 import Data.List
 import System.Exit
+import Control.Concurrent
 
 server = "irc.freenode.org"
 port = 6667
 chan = "#hirchess"
 nick = "hirchess"
 user = "hirchess"
-
+floodDelay = 750
 
 initialize :: IO Handle
 initialize = do h <- connectTo server (PortNumber (fromIntegral port))
@@ -40,6 +41,7 @@ readChannel h = do t <- hGetLine h
           pong x = write h "PONG" (':' : drop 6 x)
           correctChannel str = length (words str) >= 4 && (words str) !! 2 == chan
 
-writeChannel :: Handle -> String -> IO ()
-writeChannel _ "" = return ()
-writeChannel h s = write h "PRIVMSG" (chan ++ " :" ++ s)
+writeChannel :: Bool -> Handle -> String -> IO ()
+writeChannel _ _ "" = return ()
+writeChannel True h s = threadDelay (floodDelay * 1000) >> write h "PRIVMSG" (chan ++ " :" ++ s) -- prevent flooding
+writeChannel False h s = write h "PRIVMSG" (chan ++ " :" ++ s)
