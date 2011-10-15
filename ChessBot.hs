@@ -13,6 +13,7 @@ import Move
 import Board
 import Notation
 import Colors
+import FEN
 
 data Command = Players | AddPlayer Color String | RemovePlayer Color String
              | PrintBoard | PrintFEN | PrintStatus
@@ -62,7 +63,7 @@ evalCommand s@(BotState _ whites blacks _) Players = return (players, s)
 --evalCommand s (AddPlayer Black nick) = undefined
 --evalCommand s (RemovePlayer White nick) = undefined
 --evalCommand s (RemovePlayer Black nick) = undefined
---evalCommand s PrintFEN = undefined
+evalCommand s PrintFEN = return ([writeFEN (game s)], s)
 --evalCommand s Undo = undefined
 evalCommand s@(BotState game _ _ _) PrintBoard = return (lines (printBoard (board game)), s)
 evalCommand s@(BotState game _ _ _) PrintStatus = return (lines (printColoredState game), s)
