@@ -11,6 +11,8 @@ import Game
 import Piece
 import Move
 import Board
+import Notation
+import Colors
 
 data Command = Players | AddPlayer Color String | RemovePlayer Color String
              | PrintBoard | PrintFEN | PrintStatus
@@ -63,10 +65,31 @@ evalCommand s (RemovePlayer Black nick) = undefined
 evalCommand s@(BotState game _ _ _) PrintBoard = return (lines (printBoard (board game)), s)
 evalCommand s PrintFEN = undefined
 evalCommand s@(BotState game _ _ _) PrintStatus = return (lines (printColoredState game), s)
-evalCommand s (MakeMove move) = undefined
+evalCommand s@(BotState game whites blacks cmds) cmd@(MakeMove moveStr)
+    = do let coords = parseCoordinateNotation game moveStr
+         case coords of
+           Just (coord1, coord2) -> case getMove game coord1 coord2 of
+                                      Just move -> if isLegalMove game move then
+                                                      return ([moved move, winnerStatus (game' move)], BotState (game' move) whites blacks (cmd:cmds))
+                                                  else
+                                                      return (illegalMove, s)
+                                      Nothing -> return (invalidMove, s)
+           Nothing -> return (invalidCoordinates, s)
+    where game' move = applyMove game move
+          illegalMove = ["Illegal move"]
+          invalidMove = ["Invalid move"]
+          invalidCoordinates = ["Invalid coordinates"]
+          moved move = show (player game) ++ " player moved: " ++ printLongAlgebraicNotation move
+          winnerStatus g = if getWinner g /= Nothing then
+                               "Game over. The winner is " ++ show (player game)
+                           else
+                               ""
+
 evalCommand s Undo = undefined
-evalCommand s NewGame = undefined
-evalCommand s ClaimDraw = undefined
+evalCommand s NewGame = return (["Game restarted"], initialBotState)
+evalCommand s@(BotState game _ _ _) ClaimDraw | canClaimDraw game = return (draw, initialBotState)
+                                              | otherwise = return (["Cannot claim draw"], s)
+    where draw = [withColor notificationColor "Game over. The game is a draw!"]
 evalCommand s Invalid = return (["Invalid command"], s)
 
 serialize :: BotState -> String -> IO ()
