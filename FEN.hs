@@ -17,7 +17,8 @@ writePlayer White = "w"
 writePlayer Black = "b"
 
 writeCastlings :: [Castling] -> String
-writeCastlings = sort . concatMap toString
+writeCastlings [] = "-"
+writeCastlings castlings = sort $ concatMap toString castlings
     where toString (Long White) = "Q"
           toString (Short White) = "K"
           toString (Long Black) = "q"
