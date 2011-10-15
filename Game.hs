@@ -65,7 +65,7 @@ setHalfMoves state _ = state { halfmoveClock = halfmoveClock state + 1 }
 printColoredState :: GameState -> String
 printColoredState state = join "    " (printBoardColored (board state) ++ "\n\n"
                           ++ "Player: " ++ withColor (playerColor color) (show color)
-                          ++ "\t\tMove: " ++ show (moveNumber state) ++ "\n"
+                          ++ "              Move: " ++ show (moveNumber state) ++ "\n"
                           ++ "FEN: " ++ writeFEN state
                           ++ drawStatus
                           ++ winnerStatus) (printMoveHistory state ++ unlines (repeat "\n"))
