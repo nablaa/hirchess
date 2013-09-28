@@ -1,8 +1,9 @@
 *.hi
-*~
 *.o
 doc
 SourceGraph
 report.html
 TestBoard
 dist
+.cabal-sandbox
+cabal.sandbox.config
