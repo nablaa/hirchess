@@ -1,4 +1,4 @@
-module UI () where
+module Main (main) where
 
 import Game
 import Move

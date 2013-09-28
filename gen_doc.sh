@@ -1,3 +1,3 @@
 #! /bin/bash
-haddock -o doc -h *.hs
+haddock -o doc -h $(ls *.hs | grep -v Setup.hs)
 hlint . --report
