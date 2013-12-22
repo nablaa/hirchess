@@ -1,12 +1,21 @@
 import Test.HUnit
+import Notation
+import Move
+import Piece
 
-test1, test2 :: Test
-test1 = TestCase $ assertEqual "test1" (2 :: Integer) (1 + 1 :: Integer)
-test2 = TestCase $ assertEqual "test2" "foobar" ("foo" ++ "bar")
+import System.Exit (exitFailure, exitSuccess)
+
+testPrintingAlgebraicNotation :: Test
+testPrintingAlgebraicNotation = TestList [
+          "O-O-O" ~=? (printAlgebraicNotation (Move (Castling (Long White)) (Piece King White) (7, 4) (7, 0)))
+        , "O-O" ~=? (printAlgebraicNotation (Move (Castling (Short Black)) (Piece King Black) (0, 4) (0, 7)))
+        , "Nf3" ~=? (printAlgebraicNotation (Move Movement (Piece Knight White) (7, 6) (5, 5)))
+        ]
 
 tests :: Test
-tests = TestList [TestLabel "test1" test1, TestLabel "test2" test2]
+tests = testPrintingAlgebraicNotation
 
 main :: IO ()
-main = do _ <- runTestTT $ tests
-          return ()
+main = do c <- runTestTT $ tests
+          if failures c > 0 || errors c > 0 then exitFailure
+                                            else exitSuccess

@@ -32,6 +32,7 @@ Test-Suite spec
   Build-Depends:        base
                         , hspec >= 1.5
                         , QuickCheck
+                        , array >=0.4 && <0.5
 
 Test-Suite unit
   Type:                 exitcode-stdio-1.0
@@ -42,3 +43,4 @@ Test-Suite unit
   Build-Depends:        base
                         , HUnit
                         , QuickCheck
+                        , array >=0.4 && <0.5
