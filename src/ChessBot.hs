@@ -1,4 +1,4 @@
-module ChessBot () where
+module Main (main) where
 
 import Network
 import System.IO
