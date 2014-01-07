@@ -88,7 +88,7 @@ evalCommand s@(BotState game whites blacks cmds) cmd@(MakeMove moveStr)
           illegalMove = ["Illegal move"]
           invalidMove = ["Invalid move"]
           invalidCoordinates = ["Invalid coordinates"]
-          moved move = show (player game) ++ " player moved: " ++ printLongAlgebraicNotation move
+          moved move = show (player game) ++ " player moved: " ++ printLongAlgebraicNotation move ++ ", new FEN: " ++ writeFEN (game' move)
           winnerStatus g = if getWinner g /= Nothing then
                                "Game over. The winner is " ++ show (player game)
                            else
