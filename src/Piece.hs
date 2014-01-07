@@ -1,6 +1,7 @@
 module Piece (Piece(..), Color(..), Type(..),
               printPiece, printPieceColored, parsePiece, opponent,
-              movePattern, capturePattern) where
+              movePattern, capturePattern,
+              printPieceUTF8) where
 
 import Data.Maybe
 import Data.Char
@@ -48,6 +49,13 @@ printPiece (Piece t color) = case color of
                                White -> [toUpper c]
                                Black -> [toLower c]
     where (Just c) = lookup t pieceChars
+
+printPieceUTF8 :: Piece -> String
+printPieceUTF8 (Piece t color) = case color of
+                                  White -> [white]
+                                  Black -> [black]
+    where (Just white) = lookup t [(Pawn, '♙'), (Knight, '♘'), (Bishop, '♗'), (Rook, '♖'), (Queen, '♕'), (King, '♔')]
+          (Just black) = lookup t [(Pawn, '♟'), (Knight, '♞'), (Bishop, '♝'), (Rook, '♜'), (Queen, '♛'), (King, '♚')]
 
 printPieceColored :: Piece -> String
 printPieceColored p@(Piece t color) = withColor (printColor color) (printPiece p)

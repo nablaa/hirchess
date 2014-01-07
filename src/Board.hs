@@ -3,7 +3,7 @@ module Board (Board, Coordinates, initialBoard, parseBoardCompact, printBoardCom
               addPiece, removePiece, movePiece, isChecked, isCheck, isEmpty,
               coordinatesToString, stringToCoordinates, allCoordinates,
               isPromotionSquare, captureSquares, isDoubleMove,
-              fromEnPassantTargetSquare, toEnPassantTargetSquare) where
+              fromEnPassantTargetSquare, toEnPassantTargetSquare, printBoardUnicode) where
 
 import Data.Char
 import Data.Maybe
@@ -161,9 +161,19 @@ squareToChar :: Square -> Char
 squareToChar Empty = ' '
 squareToChar (Square p) = head $ printPiece p
 
+squareToUTF8Char :: Square -> Char
+squareToUTF8Char Empty = ' '
+squareToUTF8Char (Square p) = head $ printPieceUTF8 p
+
 printBoardCompact :: Board -> String
 printBoardCompact board = toLines $ foldr f "" (elems board)
     where f = (:) . squareToChar
+          toLines [] = []
+          toLines str = take 8 str ++ "\n" ++ toLines (drop 8 str)
+
+printBoardUnicode :: Board -> String
+printBoardUnicode board = toLines $ foldr f "" (elems board)
+    where f = (:) . squareToUTF8Char
           toLines [] = []
           toLines str = take 8 str ++ "\n" ++ toLines (drop 8 str)
 

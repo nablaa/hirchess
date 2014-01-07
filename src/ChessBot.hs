@@ -16,8 +16,9 @@ import Colors
 import FEN
 
 data Command = Players | AddPlayer Color String | RemovePlayer Color String
-             | PrintBoard | PrintCompactBoard | PrintFEN | PrintStatus | Help
-             | MakeMove String | Undo | NewGame | ClaimDraw | Invalid
+             | PrintBoard | PrintUnicodeBoard | PrintCompactBoard | PrintFEN
+             | PrintStatus | Help | MakeMove String | Undo | NewGame
+             | ClaimDraw | Invalid
                deriving (Eq, Show, Read)
 
 data BotState = BotState {
@@ -38,6 +39,7 @@ parseCommand str | cmd "!players" = Just Players
                  | cmd "!player" && count >= 3 && arg 1 == "remove" = case player of
                                                                  Just p -> Just $ AddPlayer p (arg 3)
                                                                  Nothing -> Nothing
+                 | cmd "!uboard" = Just PrintUnicodeBoard
                  | cmd "!cboard" = Just PrintCompactBoard
                  | cmd "!board" = Just PrintBoard
                  | cmd "!fen" = Just PrintFEN
@@ -68,6 +70,7 @@ evalCommand s@(BotState _ whites blacks _) Players = return (players, s)
 --evalCommand s Undo = undefined
 evalCommand s PrintFEN = return ([writeFEN (game s)], s)
 evalCommand s Help = return (helpText, s)
+evalCommand s@(BotState game _ _ _) PrintUnicodeBoard = return (lines (printBoardUnicode (board game)), s)
 evalCommand s@(BotState game _ _ _) PrintCompactBoard = return (lines (printBoardCompact (board game)), s)
 evalCommand s@(BotState game _ _ _) PrintBoard = return (lines (printBoard (board game)), s)
 evalCommand s@(BotState game _ _ _) PrintStatus = return (lines (printColoredState game), s)
@@ -103,6 +106,7 @@ helpText = ["Available commands:"
            , "!move MOVE    Makes a move. Move is given in coordinate notation. Example: \"!move b1-c3\"."
            , "!newgame      Starts a new game."
            , "!board        Prints the current game board."
+           , "!uboard       Prints the current game board using unicode UTF-8 symbols."
            , "!cboard       Prints the current game board using compact notation."
            , "!status       Prints the current game status."
            , "!fen          Prints out the FEN notation of the current game status."]

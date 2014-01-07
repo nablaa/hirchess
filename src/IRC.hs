@@ -16,6 +16,7 @@ floodDelay = 750
 
 initialize :: IO Handle
 initialize = do h <- connectTo server (PortNumber (fromIntegral port))
+                hSetEncoding h utf8
                 hSetBuffering h NoBuffering
                 write h "NICK" nick
                 write h "USER" (nick ++ " 0 * :" ++ user)
