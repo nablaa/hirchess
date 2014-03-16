@@ -1,35 +1,29 @@
 module Main (main) where
 
-import Network
+import Chess
+import Chess.FEN
 import System.IO
-import Text.Printf
 import Data.List
 import Data.Char
-import System.Exit
 import IRC
-import Game
-import Piece
-import Move
-import Board
-import Notation
-import Colors
-import FEN
+import UI
+import Data.Maybe
 
 data Command = Players | AddPlayer Color String | RemovePlayer Color String
              | PrintBoard | PrintUnicodeBoard | PrintCompactBoard | PrintFEN
              | PrintStatus | Help | MakeMove String | Undo | NewGame
              | ClaimDraw | Invalid
-               deriving (Eq, Show, Read)
+               deriving (Eq, Show)
 
 data BotState = BotState {
-      game :: GameState
+      botStateGame :: GameState
     , whitePlayers :: [String]
     , blackPlayers :: [String]
     , commandHistory :: [Command]
-    } deriving (Eq, Show, Read)
+    } deriving (Eq, Show)
 
 initialBotState :: BotState
-initialBotState = BotState initialState [] [] []
+initialBotState = BotState newGame [] [] []
 
 parseCommand :: String -> Maybe Command
 parseCommand str | cmd "!players" = Just Players
@@ -68,36 +62,24 @@ evalCommand s@(BotState _ whites blacks _) Players = return (players, s)
 --evalCommand s (RemovePlayer White nick) = undefined
 --evalCommand s (RemovePlayer Black nick) = undefined
 --evalCommand s Undo = undefined
-evalCommand s PrintFEN = return ([writeFEN (game s)], s)
+evalCommand s PrintFEN = return ([writeFEN (botStateGame s)], s)
 evalCommand s Help = return (helpText, s)
 evalCommand s@(BotState game _ _ _) PrintUnicodeBoard = return (lines (printBoardUnicode (board game)), s)
 evalCommand s@(BotState game _ _ _) PrintCompactBoard = return (lines (printBoardCompact (board game)), s)
 evalCommand s@(BotState game _ _ _) PrintBoard = return (lines (printBoard (board game)), s)
 evalCommand s@(BotState game _ _ _) PrintStatus = return (lines (printColoredState game), s)
 evalCommand s@(BotState game whites blacks cmds) cmd@(MakeMove moveStr)
-    = do let coords = parseCoordinateNotation game moveStr
-         case coords of
-           Just (coord1, coord2) -> case getMove game coord1 coord2 of
-                                      Just move -> if isLegalMove game move then
-                                                      return ([moved move, winnerStatus (game' move)], BotState (game' move) whites blacks (cmd:cmds))
-                                                  else
-                                                      return (illegalMove, s)
-                                      Nothing -> return (invalidMove, s)
-           Nothing -> return (invalidCoordinates, s)
-    where game' move = applyMove game move
-          illegalMove = ["Illegal move"]
-          invalidMove = ["Invalid move"]
-          invalidCoordinates = ["Invalid coordinates"]
-          moved move = show (player game) ++ " player moved: " ++ printLongAlgebraicNotation move ++ ", new FEN: " ++ writeFEN (game' move)
-          winnerStatus g = if getWinner g /= Nothing then
-                               "Game over. The winner is " ++ show (player game)
-                           else
-                               ""
+    = case game' of
+        Just newGameState -> return ([moved, winnerStatus newGameState], BotState newGameState whites blacks (cmd:cmds))
+        Nothing -> return (["Invalid move"], s)
+    where game' = move game moveStr
+          moved = show (currentPlayer game) ++ " player moved: " ++ moveStr ++ ", new FEN: " ++ writeFEN (fromJust game')
+          winnerStatus g = if winner g /= Nothing
+                                   then "Game over. The winner is " ++ show (currentPlayer game)
+                                   else ""
 
-evalCommand s NewGame = return (["Game restarted"], initialBotState)
-evalCommand s@(BotState game _ _ _) ClaimDraw | canClaimDraw game = return (draw, initialBotState)
-                                              | otherwise = return (["Cannot claim draw"], s)
-    where draw = [withColor notificationColor "Game over. The game is a draw!"]
+evalCommand _ NewGame = return (["Game restarted"], initialBotState)
+evalCommand s@(BotState _ _ _ _) ClaimDraw = return (["Claiming draw is not implemented"], s)
 evalCommand s Invalid = return (["Invalid command"], s)
 evalCommand s _ = return (["Invalid command"], s)
 
