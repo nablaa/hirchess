@@ -4,14 +4,24 @@ import Network
 import System.IO
 import Text.Printf
 import Data.List
-import System.Exit
 import Control.Concurrent
 
+server :: String
 server = "irc.freenode.org"
+
+port :: Int
 port = 6667
+
+chan :: String
 chan = "#hirchess"
+
+nick :: String
 nick = "hirchess"
+
+user :: String
 user = "hirchess"
+
+floodDelay :: Int
 floodDelay = 750
 
 initialize :: IO Handle
@@ -25,7 +35,7 @@ initialize = do h <- connectTo server (PortNumber (fromIntegral port))
 
 write :: Handle -> String -> String -> IO ()
 write h s t = do
-  hPrintf h "%s %s\r\n" s t
+  _ <- hPrintf h "%s %s\r\n" s t
   printf    "> %s %s\n" s t
 
 readChannel :: Handle -> IO String

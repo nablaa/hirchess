@@ -1,4 +1,4 @@
-module Main (main) where
+module Main (main, whitePlayers, blackPlayers, commandHistory, serialize, deserialize) where
 
 import Chess
 import Chess.FEN
