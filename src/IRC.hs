@@ -40,7 +40,7 @@ readChannel h = do t <- hGetLine h
     where clean = drop 1 . dropWhile (/= ':') . drop 1
           ping x = "PING :" `isPrefixOf` x
           pong x = write h "PONG" (':' : drop 6 x)
-          correctChannel str = length (words str) >= 4 && (words str) !! 2 == chan
+          correctChannel str = length (words str) >= 4 && words str !! 2 == chan
 
 writeChannel :: Bool -> Handle -> String -> IO ()
 writeChannel _ _ "" = return ()

@@ -16,5 +16,5 @@ debugPlayGame state | isJust (winner state) = putStrLn (printColoredState state)
                                      case move state moveStr of
                                              Just newState -> debugPlayGame newState
                                              Nothing -> putStrLn invalidMove >> debugPlayGame state
-    where movePrompt = "\n" ++ withColor promptColor "Enter move: "
+    where movePrompt = '\n' : withColor promptColor "Enter move: "
           invalidMove = withColor errorColor "Invalid move" ++ "\n\n"

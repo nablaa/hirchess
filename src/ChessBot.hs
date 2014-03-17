@@ -8,6 +8,7 @@ import Data.Char
 import IRC
 import UI
 import Data.Maybe
+import Control.Monad
 
 data Command = Players | AddPlayer Color String | RemovePlayer Color String
              | PrintBoard | PrintUnicodeBoard | PrintCompactBoard | PrintFEN
@@ -74,12 +75,12 @@ evalCommand s@(BotState game whites blacks cmds) cmd@(MakeMove moveStr)
         Nothing -> return (["Invalid move"], s)
     where game' = move game moveStr
           moved = show (currentPlayer game) ++ " player moved: " ++ moveStr ++ ", new FEN: " ++ writeFEN (fromJust game')
-          winnerStatus g = if winner g /= Nothing
+          winnerStatus g = if isJust (winner g)
                                    then "Game over. The winner is " ++ show (currentPlayer game)
                                    else ""
 
 evalCommand _ NewGame = return (["Game restarted"], initialBotState)
-evalCommand s@(BotState _ _ _ _) ClaimDraw = return (["Claiming draw is not implemented"], s)
+evalCommand s@(BotState{}) ClaimDraw = return (["Claiming draw is not implemented"], s)
 evalCommand s Invalid = return (["Invalid command"], s)
 evalCommand s _ = return (["Invalid command"], s)
 
@@ -110,4 +111,4 @@ runBot h state = do s <- readChannel h
 
 main :: IO ()
 main = do h <- initialize
-          runBot h initialBotState >> return ()
+          void (runBot h initialBotState)
