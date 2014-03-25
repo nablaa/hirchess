@@ -1,14 +1,24 @@
 module Main (main, whitePlayers, blackPlayers, commandHistory, serialize, deserialize) where
 
+import Protocol
 import Chess
 import Chess.FEN
-import System.IO
 import Data.List
 import Data.Char
 import IRC
 import UI
 import Data.Maybe
 import Control.Monad
+
+ircConfig :: IRC
+ircConfig = IRC {
+        ircServer = "irc.freenode.org",
+        ircPort = 6667,
+        ircChannel = "#hirchess",
+        ircNick = "hirchess",
+        ircUser = "hirchess",
+        ircHandle = Nothing
+}
 
 data Command = Players | AddPlayer Color String | RemovePlayer Color String
              | PrintBoard | PrintUnicodeBoard | PrintCompactBoard | PrintFEN
@@ -100,15 +110,16 @@ serialize = undefined
 deserialize :: String -> IO (Maybe BotState)
 deserialize = undefined
 
-runBot :: Handle -> BotState -> IO BotState
-runBot h state = do s <- readChannel h
-                    let c = parseCommand s
-                    case c of
-                      Nothing -> runBot h state
-                      Just cmd -> do (output, state') <- evalCommand state cmd
-                                     mapM_ (writeChannel (length output > 8) h) output
-                                     runBot h state'
+runBot :: (Connection a) => a -> BotState -> IO BotState
+runBot connection state = do message <- readMessage connection
+                             let command = parseCommand message
+                             case command of
+                                     Nothing -> runBot connection state
+                                     Just cmd -> do (output, state') <- evalCommand state cmd
+                                                    mapM_ (writeMessage connection) output
+                                                    runBot connection state'
+
 
 main :: IO ()
-main = do h <- initialize
-          void (runBot h initialBotState)
+main = do connection <- connect ircConfig
+          void (runBot connection initialBotState)
