@@ -1,24 +1,12 @@
-module Main (main, whitePlayers, blackPlayers, commandHistory, serialize, deserialize) where
+module ChessBot (runBot, initialBotState, whitePlayers, blackPlayers, commandHistory, serialize, deserialize) where
 
 import Protocol
 import Chess
 import Chess.FEN
 import Data.List
 import Data.Char
-import IRC
 import UI
 import Data.Maybe
-import Control.Monad
-
-ircConfig :: IRC
-ircConfig = IRC {
-        ircServer = "irc.freenode.org",
-        ircPort = 6667,
-        ircChannel = "#hirchess",
-        ircNick = "hirchess",
-        ircUser = "hirchess",
-        ircHandle = Nothing
-}
 
 data Command = Players | AddPlayer Color String | RemovePlayer Color String
              | PrintBoard | PrintUnicodeBoard | PrintCompactBoard | PrintFEN
@@ -118,8 +106,3 @@ runBot connection state = do message <- readMessage connection
                                      Just cmd -> do (output, state') <- evalCommand state cmd
                                                     mapM_ (writeMessage connection) output
                                                     runBot connection state'
-
-
-main :: IO ()
-main = do connection <- connect ircConfig
-          void (runBot connection initialBotState)

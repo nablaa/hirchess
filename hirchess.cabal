@@ -27,7 +27,7 @@ executable hirchess
                         , hchesslib
 
 executable chessbot
-  main-is:              ChessBot.hs
+  main-is:              Hirchess.hs
   hs-source-dirs:       src
   Ghc-Options:          -Wall -Werror
   default-language:     Haskell2010
