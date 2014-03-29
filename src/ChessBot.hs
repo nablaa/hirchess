@@ -40,11 +40,21 @@ commandOutput bot@(BotState game) (Move moveStr) = case move game moveStr of
                                                            Just game' -> (bot { botGameState = game' }, "Moved: " ++ moveStr)
                                                            Nothing -> (bot, "Invalid move: " ++ moveStr)
 
-evalCommand :: BotState -> Command -> IO BotState
-evalCommand = undefined
+evalCommand :: (Connection a) => a -> BotState -> Command -> IO BotState
+evalCommand connection state command = do let (newState, output) = commandOutput state command
+                                          writeMessage connection output
+                                          return newState
+
+evalInput :: (Connection a) => a -> BotState -> String -> IO BotState
+evalInput connection state input = case parseCommand input of
+                                           Just command -> evalCommand connection state command
+                                           Nothing -> do writeMessage connection ("Invalid command: " ++ input)
+                                                         return state
 
 runBot :: (Connection a) => a -> BotState -> IO BotState
-runBot = undefined
+runBot connection state = do input <- readMessage connection
+                             newState <- evalInput connection state input
+                             runBot connection newState
 
 helpText :: [String]
 helpText = ["Available commands:"
