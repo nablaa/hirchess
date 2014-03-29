@@ -57,9 +57,12 @@ ircReadMessage irc = do t <- hGetLine h
 
 ircWriteMessage :: IRC -> String -> IO ()
 ircWriteMessage _ "" = return ()
-ircWriteMessage irc str = write h "PRIVMSG" (channel ++ " :" ++ str) >> threadDelay (floodDelay * 1000) -- prevent flooding
+ircWriteMessage irc str = mapM_ (writeOneLine h channel) (lines str)
         where h = fromJust $ ircHandle irc
               channel = ircChannel irc
+
+writeOneLine :: Handle -> String ->  String -> IO ()
+writeOneLine handle channel str = write handle "PRIVMSG" (channel ++ " :" ++ str) >> threadDelay (floodDelay * 1000) -- prevent flooding
 
 write :: Handle -> String -> String -> IO ()
 write h s t = do
