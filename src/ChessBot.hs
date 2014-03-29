@@ -37,8 +37,17 @@ commandOutput bot@(BotState game) Board = (bot, printBoard (board game))
 commandOutput bot@(BotState game) Status = (bot, printColoredState game)
 commandOutput bot@(BotState game) FEN = (bot, "FEN: " ++ writeFEN game)
 commandOutput bot@(BotState game) (Move moveStr) = case move game moveStr of
-                                                           Just game' -> (bot { botGameState = game' }, "Moved: " ++ moveStr)
+                                                           Just game' -> (bot { botGameState = game' }, moveStatusMessage game' moveStr)
                                                            Nothing -> (bot, "Invalid move: " ++ moveStr)
+
+moveStatusMessage :: GameState -> String -> String
+moveStatusMessage game moveStr = "Moved: " ++ moveStr ++ winnerStatus ++ drawStatus
+        where winnerStatus = case winner game of
+                                     Just player -> "\nGame over. The winner is " ++ colorStr player
+                                     Nothing -> ""
+              colorStr White = "White"
+              colorStr Black = "Black"
+              drawStatus = if isDraw game then "\nGame is draw!" else ""
 
 evalCommand :: (Connection a) => a -> BotState -> Command -> IO BotState
 evalCommand connection state command = do let (newState, output) = commandOutput state command
