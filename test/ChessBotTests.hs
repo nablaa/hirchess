@@ -53,6 +53,7 @@ parseCommandSpec =
             parseCommand "!move e2-e4 foo" `shouldBe` Nothing
             parseCommand "!move Nf3" `shouldBe` Just (Move "Nf3")
             parseCommand "!move    O-O-O" `shouldBe` Just (Move "O-O-O")
+            parseCommand "  !move    O-O-O  " `shouldBe` Just (Move "O-O-O")
 
 commandOutputSpec :: Spec
 commandOutputSpec =

@@ -14,8 +14,11 @@ data Command = Move String | NewGame | Help | Board | Status | FEN
              deriving (Eq, Show)
 
 parseCommand :: String -> Maybe Command
-parseCommand ('!':commandStr) = parseCommandStr commandStr
-parseCommand _ = Nothing
+parseCommand = parseCommand' . unwords . words
+
+parseCommand' :: String -> Maybe Command
+parseCommand' ('!':commandStr) = parseCommandStr commandStr
+parseCommand' _ = Nothing
 
 parseCommandStr :: String -> Maybe Command
 parseCommandStr "newgame" = Just NewGame
