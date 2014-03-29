@@ -2,11 +2,15 @@ module ChessBotTests where
 
 import Test.Hspec
 import ChessBot
+import Data.Maybe
+import Chess
+import Chess.FEN
 
 chessBotSpec :: IO ()
 chessBotSpec = hspec $
-        describe "ChessBot"
+        describe "ChessBot" $ do
           parseCommandSpec
+          commandOutputSpec
 
 parseCommandSpec :: Spec
 parseCommandSpec =
@@ -49,3 +53,28 @@ parseCommandSpec =
             parseCommand "!move e2-e4 foo" `shouldBe` Nothing
             parseCommand "!move Nf3" `shouldBe` Just (Move "Nf3")
             parseCommand "!move    O-O-O" `shouldBe` Just (Move "O-O-O")
+
+commandOutputSpec :: Spec
+commandOutputSpec =
+        describe "commandOutput" $ do
+          it "should return initial bot state and message when new game command is given" $
+            commandOutput testState NewGame `shouldBe` (initialBotState, "New game started")
+
+          it "should not modify bot state when no state modifying command command is given" $ do
+            fst (commandOutput testState Help) `shouldBe` testState
+            fst (commandOutput testState Board) `shouldBe` testState
+            fst (commandOutput testState Status) `shouldBe` testState
+            fst (commandOutput testState FEN) `shouldBe` testState
+
+          it "should return game FEN when FEN command is given" $
+            snd (commandOutput testState FEN) `shouldBe` "FEN: " ++ writeFEN (botGameState testState)
+
+          it "should not modify game state if invalid move is given" $
+            botGameState (fst (commandOutput testState (Move "a2-a9"))) `shouldBe` botGameState testState
+
+          it "should modify game state if valid move is given" $
+            botGameState (fst (commandOutput testState (Move "e7-e5"))) `shouldBe` fromJust (move (botGameState testState) "e7-e5")
+
+
+testState :: BotState
+testState = BotState (fromJust (move newGame "e2-e4"))
