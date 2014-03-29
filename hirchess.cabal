@@ -46,6 +46,7 @@ Test-Suite spec
                         , hspec >= 1.5
                         , QuickCheck
                         , array >=0.4 && <0.5
+                        , hchesslib
 
 Test-suite hlint
   type:                 exitcode-stdio-1.0

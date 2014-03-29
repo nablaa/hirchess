@@ -1,7 +1,5 @@
 import Test.Hspec
+import ChessBotTests
 
 main :: IO ()
-main = hspec $
-        describe "Example Spec" $
-          it "should pass" $
-            (0 :: Int) `shouldBe` (0 :: Int)
+main = chessBotSpec
