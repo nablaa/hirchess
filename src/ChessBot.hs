@@ -60,8 +60,7 @@ evalCommand connection state command = do let (newState, output) = commandOutput
 evalInput :: (Connection a) => a -> BotState -> String -> IO BotState
 evalInput connection state input = case parseCommand input of
                                            Just command -> evalCommand connection state command
-                                           Nothing -> do writeMessage connection ("Invalid command: " ++ input)
-                                                         return state
+                                           Nothing -> return state
 
 runBot :: (Connection a) => a -> BotState -> IO BotState
 runBot connection state = do input <- readMessage connection
