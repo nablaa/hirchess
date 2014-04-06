@@ -46,13 +46,17 @@ ircReadMessage irc = do t <- try (hGetLine h) :: IO (Either IOError String)
                         case t of
                                 Left e -> do putStrLn $ "Error reading line: " ++ show e
                                              ircReadMessage irc
-                                Right line -> do let s = init line
-                                                 putStrLn s
-                                                 if ping s
-                                                         then pong s >> ircReadMessage irc
-                                                         else if correctChannel s
-                                                                      then return (clean s)
-                                                                      else ircReadMessage irc
+                                Right line -> ircReadLine irc line
+        where h = fromJust $ ircHandle irc
+
+ircReadLine :: IRC -> String -> IO String
+ircReadLine irc line = do let s = init line
+                          putStrLn s
+                          if ping s
+                                  then pong s >> ircReadMessage irc
+                                  else if correctChannel s
+                                               then return (clean s)
+                                               else ircReadMessage irc
         where h = fromJust $ ircHandle irc
               clean = drop 1 . dropWhile (/= ':') . drop 1
               ping x = "PING :" `isPrefixOf` x
