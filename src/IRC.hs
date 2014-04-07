@@ -30,7 +30,7 @@ floodDelay = 750
 ircConnect :: IRC -> IO IRC
 ircConnect irc@(IRC server port channel nick user _) =
         do h <- connectTo server (PortNumber (fromIntegral port))
-           hSetEncoding h utf8
+           hSetEncoding h char8
            hSetBuffering h NoBuffering
            write h "NICK" nick
            write h "USER" (nick ++ " 0 * :" ++ user)
